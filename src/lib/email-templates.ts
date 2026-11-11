@@ -122,7 +122,7 @@ export function studentEmail(input: {
       "If you are in immediate danger, contact campus security or the police. This mailbox is not an emergency service.",
       "",
       "MNS University of Agriculture, Multan",
-      "Old Shujabad Road, Multan",
+      "University Road, Multan",
     ].join("\n"),
   };
 }

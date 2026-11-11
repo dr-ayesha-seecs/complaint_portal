@@ -6,7 +6,7 @@ export function SiteFooter() {
       <div className="topbar-inner footer-grid">
         <div>
           <strong>MNS University of Agriculture, Multan</strong>
-          <p>Old Shujabad Road, Multan, Pakistan</p>
+          <p>University Road, Multan, Pakistan</p>
           <p>University exchange: 061-9201541 · info@mnsuam.edu.pk</p>
           <p>
             <a href="https://mnsuam.edu.pk">mnsuam.edu.pk</a>

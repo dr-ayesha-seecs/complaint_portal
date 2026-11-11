@@ -17,7 +17,7 @@ export default function PrivacyPage() {
 
         <h2>Who is responsible</h2>
         <p>
-          MNS University of Agriculture, Multan, Old Shujabad Road, Multan. Questions about this notice can go to the Registrar or the Directorate of Students Affairs through the university exchange, 061-9201541, or info@mnsuam.edu.pk. The portal owner inside the university is the Chairperson, Department of Artificial Intelligence and Data Science, Prof. Dr. Ayesha Hakim.
+          MNS University of Agriculture, Multan, University Road, Multan. Questions about this notice can go to the Registrar or the Directorate of Students Affairs through the university exchange, 061-9201541, or info@mnsuam.edu.pk. The portal owner inside the university is the Chairperson, Department of Artificial Intelligence and Data Science, Prof. Dr. Ayesha Hakim.
         </p>
 
         <h2>What we collect</h2>
