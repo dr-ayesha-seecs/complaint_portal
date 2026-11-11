@@ -3,7 +3,7 @@ import { insertUser } from "@/lib/auth";
 import { audit } from "@/lib/audit";
 import { requireUser } from "@/lib/current-user";
 import { HttpError, assertSameOrigin, readJson, toErrorResponse } from "@/lib/http";
-import { canManageDirectory, isRole } from "@/lib/rbac";
+import { canManageUsers, isRole } from "@/lib/rbac";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   try {
     assertSameOrigin(req);
     const actor = await requireUser();
-    if (!canManageDirectory(actor)) throw new HttpError(403, "Only the Vice Chancellor can create accounts.");
+    if (!canManageUsers(actor)) throw new HttpError(403, "Only a system administrator can create accounts.");
     const body = (await readJson(req)) as {
       email?: string;
       name?: string;

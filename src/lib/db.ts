@@ -159,6 +159,14 @@ async function bootstrapUsers(): Promise<void> {
       role: "vice_chancellor",
     });
   }
+  if (process.env.BOOTSTRAP_ADMIN_EMAIL && process.env.BOOTSTRAP_ADMIN_PASSWORD) {
+    accounts.push({
+      email: process.env.BOOTSTRAP_ADMIN_EMAIL,
+      name: process.env.BOOTSTRAP_ADMIN_NAME || "System administrator",
+      password: process.env.BOOTSTRAP_ADMIN_PASSWORD,
+      role: "admin",
+    });
+  }
   if (process.env.BOOTSTRAP_USERS_JSON) {
     try {
       const parsed = JSON.parse(process.env.BOOTSTRAP_USERS_JSON) as unknown;

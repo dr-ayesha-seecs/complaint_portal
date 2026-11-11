@@ -5,7 +5,7 @@ import { organisation } from "../src/data/organisation";
 import { staffEmail } from "../src/lib/email-templates";
 import { csvCell } from "../src/lib/csv";
 import { isPlaceholderEmail } from "../src/lib/ids";
-import { canAccessComplaint, scopeClause, type SessionUser } from "../src/lib/rbac";
+import { canAccessComplaint, canAssignComplaint, canHandleComplaint, canManageDirectory, canManageUsers, canViewAudit, canViewComplaints, scopeClause, type SessionUser } from "../src/lib/rbac";
 import { buildRecipientList } from "../src/lib/routing";
 import { addWorkingDays, computeSla, isOverdue } from "../src/lib/sla";
 import { complaintSchema } from "../src/lib/validation";
@@ -173,6 +173,42 @@ describe("routing and access", () => {
   });
 });
 
+describe("roles and assignments", () => {
+  const admin: SessionUser = {
+    id: "admin-1",
+    email: "ayesha.hakim@mnsuam.edu.pk",
+    name: "Admin",
+    role: "admin",
+    facultyId: null,
+    departmentId: null,
+    active: true,
+  };
+  const vc: SessionUser = { ...admin, id: "vc-1", email: "vc@mnsuam.edu.pk", name: "Vice Chancellor", role: "vice_chancellor" };
+  const academic = { facultyId: "foc", departmentId: "foc-aids", category: "academic_teaching" };
+
+  it("keeps administrators out of complaint files and gives them accounts and contacts", () => {
+    expect(canAccessComplaint(admin, academic)).toBe(false);
+    expect(canViewComplaints(admin)).toBe(false);
+    expect(canHandleComplaint(admin)).toBe(false);
+    expect(canAssignComplaint(admin)).toBe(false);
+    expect(canManageDirectory(admin)).toBe(true);
+    expect(canManageUsers(admin)).toBe(true);
+    expect(canViewAudit(admin)).toBe(true);
+    expect(scopeClause(admin).sql).toBe("0 = 1");
+  });
+
+  it("lets the Vice Chancellor read every complaint and assign, but not manage accounts", () => {
+    expect(canAccessComplaint(vc, academic)).toBe(true);
+    expect(canViewComplaints(vc)).toBe(true);
+    expect(canHandleComplaint(vc)).toBe(false);
+    expect(canAssignComplaint(vc)).toBe(true);
+    expect(canManageDirectory(vc)).toBe(false);
+    expect(canManageUsers(vc)).toBe(false);
+    expect(canViewAudit(vc)).toBe(false);
+    expect(scopeClause(vc).sql).toBe("1 = 1");
+  });
+});
+
 describe("complaint flow", () => {
   it("stores an anonymous complaint, rejects anonymous harassment, and enforces access", async () => {
     const { submitComplaint, trackComplaint, getComplaintForUser } = await import("../src/lib/complaints");
@@ -281,5 +317,31 @@ describe("complaint flow", () => {
     const visible = await getComplaintForUser(aidsChair, academicId);
     expect(visible.trackingNumber).toBe(created.trackingNumber);
     expect(visible.notes).toEqual([]);
+
+    const vc = await insertUser({
+      email: "vc.test@mnsuam.invalid",
+      name: "Vice Chancellor",
+      password: "ChangeMe_Now_12",
+      role: "vice_chancellor",
+      facultyId: null,
+      departmentId: null,
+    });
+    const admin = await insertUser({
+      email: "admin.test@mnsuam.invalid",
+      name: "System Admin",
+      password: "ChangeMe_Now_12",
+      role: "admin",
+      facultyId: null,
+      departmentId: null,
+    });
+    await expect(getComplaintForUser(admin, academicId)).rejects.toMatchObject({ status: 404 });
+    const { applyComplaintAction } = await import("../src/lib/complaints");
+    await expect(applyComplaintAction(vc, academicId, { type: "status", status: "acknowledged" }, "http://localhost:3000")).rejects.toMatchObject({
+      status: 403,
+    });
+    await applyComplaintAction(vc, academicId, { type: "assign", assigneeId: csChair.id }, "http://localhost:3000");
+    const assigned = await getComplaintForUser(csChair, academicId);
+    expect(assigned.trackingNumber).toBe(created.trackingNumber);
+    expect(assigned.assignees.some((item) => item.id === csChair.id)).toBe(true);
   });
 });

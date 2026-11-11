@@ -6,6 +6,7 @@ import { listDirectory } from "@/lib/admin";
 import { CATEGORIES, STATUSES, categoryLabel, statusLabel } from "@/lib/categories";
 import { listComplaints } from "@/lib/complaints";
 import { getCurrentUser } from "@/lib/current-user";
+import { canViewComplaints } from "@/lib/rbac";
 import { formatDateTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +22,7 @@ export default async function ComplaintsPage({
 }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  if (!canViewComplaints(user)) redirect("/dashboard");
   const params = await searchParams;
   const filters = {
     q: one(params.q),

@@ -148,6 +148,15 @@ export async function updateUser(
       throw new HttpError(400, "Keep at least one active Vice Chancellor account.");
     }
   }
+  if (existing.role === "admin" && existing.active && (!active || role !== "admin")) {
+    const others = await getClient().execute({
+      sql: "SELECT COUNT(*) AS n FROM users WHERE role = 'admin' AND active = 1 AND id != ?",
+      args: [userId],
+    });
+    if (Number(others.rows[0]?.n ?? 0) === 0) {
+      throw new HttpError(400, "Keep at least one active system administrator account.");
+    }
+  }
   if (userId === actor.id && active === false) throw new HttpError(400, "You cannot deactivate your own account.");
   const passwordHash = patch.password ? await hashPassword(checkedPassword(patch.password)) : null;
   await getClient().execute({

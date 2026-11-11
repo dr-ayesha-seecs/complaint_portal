@@ -11,7 +11,7 @@ import type { DepartmentContact, FacultyContact } from "./view-types";
 export type { DepartmentContact, FacultyContact };
 
 function assertVc(user: SessionUser): void {
-  if (!canManageDirectory(user)) throw new HttpError(403, "Only the Vice Chancellor can change these records.");
+  if (!canManageDirectory(user)) throw new HttpError(403, "Only a system administrator can change these records.");
 }
 
 export async function listDirectory(): Promise<FacultyContact[]> {

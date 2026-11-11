@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { ContactsAdmin } from "@/components/ContactsAdmin";
 import { listDirectory } from "@/lib/admin";
 import { getCurrentUser } from "@/lib/current-user";
+import { canManageDirectory } from "@/lib/rbac";
 import { harassmentSettings } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function ContactsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (user.role !== "vice_chancellor") redirect("/dashboard");
+  if (!canManageDirectory(user)) redirect("/dashboard");
   const [directory, harassment] = await Promise.all([listDirectory(), harassmentSettings()]);
   return (
     <>

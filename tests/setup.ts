@@ -1,0 +1,11 @@
+process.env.TURSO_DATABASE_URL = "file:data/vitest.db";
+delete process.env.TURSO_AUTH_TOKEN;
+delete process.env.TURSO_PORTAL_AUTH_TOKEN;
+process.env.SECRET_PEPPER = "test-pepper-0123456789abcdef0123456789abcdef";
+process.env.BCRYPT_COST = "4";
+process.env.NODE_ENV = "test";
+delete process.env.BOOTSTRAP_VC_EMAIL;
+delete process.env.BOOTSTRAP_VC_PASSWORD;
+delete process.env.BOOTSTRAP_ADMIN_EMAIL;
+delete process.env.BOOTSTRAP_ADMIN_PASSWORD;
+delete process.env.BOOTSTRAP_USERS_JSON;

@@ -34,8 +34,12 @@ export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset
   }, [turnstileSiteKey]);
 
   useEffect(() => {
-    if (error) summaryRef.current?.focus();
-  }, [error]);
+    if (!error) return;
+    const node = summaryRef.current;
+    if (!node) return;
+    node.scrollIntoView({ behavior: "smooth", block: "center" });
+    node.focus();
+  }, [error, fields]);
 
   const departments = useMemo(() => org.find((item) => item.id === facultyId)?.departments ?? [], [org, facultyId]);
 
@@ -91,7 +95,7 @@ export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset
       return;
     }
     const body = new FormData();
-    body.set("payload", JSON.stringify(payload));
+    body.set("payload", JSON.stringify(parsed.data));
     const selected = form.getAll("files");
     for (const file of selected) {
       if (file instanceof File && file.size > 0) body.append("files", file);
@@ -99,15 +103,20 @@ export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset
     const turnstile = form.get("cf-turnstile-response");
     if (typeof turnstile === "string") body.set("turnstileToken", turnstile);
     setPending(true);
-    const response = await fetch("/api/complaints", { method: "POST", body });
-    const result = (await response.json().catch(() => null)) as (Success & { error?: string; fields?: Record<string, string[]> }) | null;
-    setPending(false);
-    if (!response.ok || !result || !result.trackingNumber) {
-      setError(result?.error || "The complaint could not be submitted.");
-      setFields(result?.fields || {});
-      return;
+    try {
+      const response = await fetch("/api/complaints", { method: "POST", body });
+      const result = (await response.json().catch(() => null)) as (Success & { error?: string; fields?: Record<string, string[]> }) | null;
+      if (!response.ok || !result || !result.trackingNumber) {
+        setError(result?.error || "The complaint could not be submitted. Please try again.");
+        setFields(result?.fields || {});
+        return;
+      }
+      setSuccess(result);
+    } catch {
+      setError("The complaint could not be submitted. Please check your connection and try again.");
+    } finally {
+      setPending(false);
     }
-    setSuccess(result);
   }
 
   if (success) {
@@ -146,7 +155,7 @@ export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset
   const groups = [...new Set(CATEGORIES.map((item) => item.group))];
 
   return (
-    <form className="panel" onSubmit={onSubmit}>
+    <form className="panel" onSubmit={onSubmit} noValidate>
       <h1>
         File a complaint
         <span className="ur">شکایت درج کریں</span>
@@ -155,17 +164,23 @@ export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset
       {error ? (
         <div className="error-summary" role="alert" tabIndex={-1} ref={summaryRef}>
           <strong>{error}</strong>
-          {Object.values(fields).flat().slice(0, 6).map((message) => (
-            <div key={message}>{message}</div>
-          ))}
+          {Object.entries(fields).map(([key, messages]) =>
+            messages.map((message) => (
+              <div key={`${key}-${message}`}>
+                <a href={`#${key === "category" ? "category-group" : key}`}>{FIELD_LABELS[key] || key}</a>
+                {": "}
+                {message}
+              </div>
+            )),
+          )}
         </div>
       ) : null}
 
       <fieldset>
-        <legend>What is this about?</legend>
+        <legend id="category-group">What is this about?</legend>
         <div className="choice-grid">
           {groups.map((group) => (
-            <div key={group} style={{ display: "contents" }}>
+            <div key={group} className="choice-group">
               <p className="group-label">{group}</p>
               {CATEGORIES.filter((item) => item.group === group).map((item) => (
                 <label className="choice" key={item.id}>
@@ -288,7 +303,7 @@ export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset
           <TextField id="subject" label="Subject (required)" fields={fields} maxLength={180} />
           <div className="field">
             <label htmlFor="description">Description (required)</label>
-            <textarea id="description" name="description" required minLength={30} maxLength={8000} />
+            <textarea id="description" name="description" required minLength={30} maxLength={8000} aria-invalid={fields.description?.length ? true : undefined} />
             <span className="hint">What happened, when, and what you have already tried. At least a few sentences.</span>
             {fieldMessage(fields, "description")}
           </div>
@@ -358,12 +373,35 @@ function TextField({
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
-      <input id={id} name={id} type={type} autoComplete={autoComplete} maxLength={maxLength} />
+      <input id={id} name={id} type={type} autoComplete={autoComplete} maxLength={maxLength} aria-invalid={fields[id]?.length ? true : undefined} />
       {hint ? <span className="hint">{hint}</span> : null}
       {fieldMessage(fields, id)}
     </div>
   );
 }
+
+const FIELD_LABELS: Record<string, string> = {
+  category: "What this is about",
+  harassmentType: "Type of harassment",
+  anonymous: "Your identity",
+  facultyId: "Faculty",
+  departmentId: "Department",
+  programme: "Programme",
+  semester: "Semester",
+  subject: "Subject",
+  description: "Description",
+  desiredOutcome: "Outcome",
+  incidentDate: "Date of the incident",
+  location: "Location",
+  respondentName: "Who the complaint is about",
+  studentName: "Full name",
+  registrationNumber: "Registration / roll number",
+  studentEmail: "Email",
+  studentPhone: "Mobile number",
+  confirmTruth: "Truth confirmation",
+  confirmPrivacy: "Privacy notice",
+  confirmNonRetaliation: "Non-retaliation acknowledgement",
+};
 
 function fieldMessage(fields: Record<string, string[]>, key: string) {
   const messages = fields[key];

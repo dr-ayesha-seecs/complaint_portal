@@ -12,6 +12,7 @@ export default defineConfig({
       BCRYPT_COST: "4",
       NODE_ENV: "test",
     },
+    setupFiles: ["./tests/setup.ts"],
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },

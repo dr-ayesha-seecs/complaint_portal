@@ -12,11 +12,12 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
     const user = await requireUser();
     const { id } = await context.params;
     const body = (await readJson(req)) as {
-      type?: "status" | "note" | "respond" | "escalate" | "rotate_secret";
+      type?: "status" | "note" | "respond" | "escalate" | "rotate_secret" | "assign";
       status?: string;
       message?: string;
       note?: string;
       confirmedIdentity?: boolean;
+      assigneeId?: string;
     };
     if (!body.type) return NextResponse.json({ error: "Choose an action." }, { status: 400 });
     const result = await applyComplaintAction(
@@ -28,6 +29,7 @@ export async function POST(req: Request, context: { params: Promise<{ id: string
         message: body.message,
         note: body.note,
         confirmedIdentity: body.confirmedIdentity,
+        assigneeId: body.assigneeId,
       },
       appUrlFromRequest(req),
     );

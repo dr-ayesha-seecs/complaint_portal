@@ -39,13 +39,14 @@ Overdue files are flagged on the staff dashboard. There is no background cron: t
 
 | Role | Sees | Can update |
 | --- | --- | --- |
-| `vice_chancellor` | Every complaint, full detail, filters, search, CSV export, dashboard counts, contacts, accounts, audit log | Yes |
+| `admin` | Accounts, contacts, settings, and the audit log. Does **not** see complaint files or their contents | Yes, for accounts and contacts |
+| `vice_chancellor` | Every complaint, full detail, filters, search, CSV export, and dashboard counts | No status changes. May assign a complaint to an additional staff account, which is audited |
 | `dean` | One faculty | Yes, for that faculty |
 | `chairperson` | One department | Yes, for that department |
-| `staff` | One department, or one faculty, or (if neither is set) all **non-harassment** complaints | Yes, inside that boundary |
-| `harassment_focal` | Harassment complaints only | Yes, for those files |
+| `staff` | One department, or one faculty, or (if neither is set) all **non-harassment** complaints, plus any file assigned by the Vice Chancellor | Yes, inside that boundary |
+| `harassment_focal` | Harassment complaints only, plus any file assigned by the Vice Chancellor | Yes, for those files |
 
-Deans and chairpersons do see harassment files in their own faculty or department, because they are the people notified. Central unassigned staff do not. Export is available to every signed-in role, but only for the rows that role can already see. The Vice Chancellor is the only person who can edit contacts, create accounts, and read the audit log.
+Deans and chairpersons do see harassment files in their own faculty or department, because they are the people notified. Central unassigned staff do not. Export is available to every signed-in role that can see complaints, but only for the rows that role can already see. A system administrator (`admin`) is the only person who can edit contacts, create or deactivate accounts, and read the audit log. The Vice Chancellor has read-only access to complaints and can assign a file to another officer.
 
 Passwords are hashed with bcrypt. Sessions last 8 hours in an httpOnly cookie. Mutating requests must come from the same site. Inputs are checked with Zod. Complaint submission, tracking, appeals, and sign-in are rate limited. A hidden honeypot field drops obvious spam. If `TURNSTILE_SECRET_KEY` is set, Cloudflare Turnstile is required as well. Staff views and changes are written to an audit log. IP addresses on complaints are stored only as a hash.
 
@@ -79,6 +80,9 @@ Copy `.env.example` to `.env.local` for local development. On Vercel and Netlify
 | `BOOTSTRAP_VC_EMAIL` | Creates the Vice Chancellor account if that email does not exist yet |
 | `BOOTSTRAP_VC_NAME` | Display name. Defaults to “Vice Chancellor” |
 | `BOOTSTRAP_VC_PASSWORD` | Initial password. At least 12 characters, with upper case, lower case, and a number. Not reset on later boots unless you ask |
+| `BOOTSTRAP_ADMIN_EMAIL` | Creates the system administrator account if that email does not exist yet |
+| `BOOTSTRAP_ADMIN_NAME` | Display name. Defaults to “System administrator” |
+| `BOOTSTRAP_ADMIN_PASSWORD` | Initial administrator password, same strength rules as the Vice Chancellor password |
 | `BOOTSTRAP_USERS_JSON` | Optional JSON array of extra accounts. See `.env.example` |
 | `BOOTSTRAP_RESET_PASSWORDS` | `true` overwrites passwords for bootstrap emails on the next boot. Turn it off again |
 | `VC_NOTIFICATION_EMAIL` | Where escalation mail for the Vice Chancellor goes. On first boot this falls back to `BOOTSTRAP_VC_EMAIL`, then a placeholder. Editable under Contacts |

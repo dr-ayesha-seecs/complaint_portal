@@ -153,4 +153,17 @@ export const SCHEMA_STATEMENTS: string[] = [
   `CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at)`,
   `CREATE INDEX IF NOT EXISTS idx_mail_complaint ON mail_log(complaint_id)`,
   `CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`,
+  `CREATE TABLE IF NOT EXISTS complaint_assignments (
+    id TEXT PRIMARY KEY,
+    complaint_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    assigned_by TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    UNIQUE(complaint_id, user_id),
+    FOREIGN KEY (complaint_id) REFERENCES complaints(id),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (assigned_by) REFERENCES users(id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS idx_assignments_user ON complaint_assignments(user_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_assignments_complaint ON complaint_assignments(complaint_id)`,
 ];

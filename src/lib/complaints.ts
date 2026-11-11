@@ -8,7 +8,7 @@ import { HttpError } from "./http";
 import { generateSecret, generateTrackingNumber, hashIp, hashSecret, isPlaceholderEmail, verifySecret } from "./ids";
 import { deliverEmail } from "./mailer";
 import { assertRateLimit } from "./rate-limit";
-import { canAccessComplaint, scopeClause, type SessionUser } from "./rbac";
+import { canAccessComplaint, canAssignComplaint, canHandleComplaint, scopeClause, type SessionUser } from "./rbac";
 import { flag, integer, requiredText, text, type SqlRow } from "./rows";
 import { buildRecipientList } from "./routing";
 import { harassmentSettings } from "./settings";
@@ -72,6 +72,7 @@ export type ComplaintDetail = ComplaintRecord & {
   events: ComplaintEvent[];
   notes: { id: string; body: string; createdAt: string; authorName: string }[];
   attachments: { id: string; filename: string; mime: string; size: number; createdAt: string }[];
+  assignees: Assignee[];
 };
 
 export type ComplaintListItem = {
@@ -611,7 +612,104 @@ function filterSql(user: SessionUser, filters: ComplaintFilters): { where: strin
   return { where: clauses.join(" AND "), args };
 }
 
+export type Assignee = { id: string; name: string; email: string; role: string; assignedAt: string };
+
+async function hasAssignment(userId: string, complaintId: string): Promise<boolean> {
+  const row = await getClient().execute({
+    sql: "SELECT 1 AS n FROM complaint_assignments WHERE complaint_id = ? AND user_id = ? LIMIT 1",
+    args: [complaintId, userId],
+  });
+  return row.rows.length > 0;
+}
+
+export async function mayAccessComplaint(
+  user: SessionUser,
+  complaintId: string,
+  complaint: { facultyId: string; departmentId: string; category: string },
+): Promise<boolean> {
+  if (!user.active) return false;
+  if (user.role === "admin") return false;
+  if (canAccessComplaint(user, complaint)) return true;
+  return hasAssignment(user.id, complaintId);
+}
+
+export async function listAssignees(complaintId: string): Promise<Assignee[]> {
+  const rows = await getClient().execute({
+    sql: `SELECT u.id, u.name, u.email, u.role, a.created_at
+          FROM complaint_assignments a JOIN users u ON u.id = a.user_id
+          WHERE a.complaint_id = ? ORDER BY a.created_at ASC`,
+    args: [complaintId],
+  });
+  return rows.rows.map((row) => {
+    const record = row as SqlRow;
+    return {
+      id: requiredText(record, "id"),
+      name: requiredText(record, "name"),
+      email: requiredText(record, "email"),
+      role: requiredText(record, "role"),
+      assignedAt: requiredText(record, "created_at"),
+    };
+  });
+}
+
+export async function listAssignableUsers(user: SessionUser): Promise<{ id: string; name: string; email: string; role: string }[]> {
+  if (!canAssignComplaint(user)) throw new HttpError(403, "Only the Vice Chancellor can assign complaints.");
+  await ensureDatabase();
+  const rows = await getClient().execute(
+    "SELECT id, name, email, role FROM users WHERE active = 1 AND role != 'admin' ORDER BY name",
+  );
+  return rows.rows.map((row) => {
+    const record = row as SqlRow;
+    return {
+      id: requiredText(record, "id"),
+      name: requiredText(record, "name"),
+      email: requiredText(record, "email"),
+      role: requiredText(record, "role"),
+    };
+  });
+}
+
+export async function assignComplaint(user: SessionUser, complaintId: string, assigneeId: string): Promise<void> {
+  if (!canAssignComplaint(user)) throw new HttpError(403, "Only the Vice Chancellor can assign complaints.");
+  const id = assigneeId.trim();
+  if (!id) throw new HttpError(400, "Choose a person to assign this complaint to.");
+  const detail = await getComplaintForUser(user, complaintId);
+  const row = await getClient().execute({ sql: "SELECT * FROM users WHERE id = ?", args: [id] });
+  if (!row.rows[0]) throw new HttpError(404, "That account was not found.");
+  const assigneeRole = String((row.rows[0] as SqlRow).role || "");
+  const assigneeName = String((row.rows[0] as SqlRow).name || "");
+  const active = Number((row.rows[0] as SqlRow).active ?? 0) === 1;
+  if (!active) throw new HttpError(400, "That account is not active.");
+  if (assigneeRole === "admin") throw new HttpError(400, "System administrators do not receive access to complaint files.");
+  const now = new Date().toISOString();
+  try {
+    await getClient().execute({
+      sql: `INSERT INTO complaint_assignments (id, complaint_id, user_id, assigned_by, created_at)
+            VALUES (?, ?, ?, ?, ?)`,
+      args: [randomUUID(), complaintId, id, user.id, now],
+    });
+  } catch {
+    throw new HttpError(400, "That person already has access to this complaint.");
+  }
+  await addEvent(
+    complaintId,
+    user.id,
+    "assigned",
+    detail.status,
+    detail.status,
+    `The Vice Chancellor assigned this complaint to ${assigneeName}.`,
+  );
+  await audit({
+    actorId: user.id,
+    action: "complaint_assigned",
+    entity: "complaint",
+    entityId: complaintId,
+    meta: { assigneeId: id, assigneeName },
+  });
+}
+
 export async function getComplaintForUser(user: SessionUser, id: string): Promise<ComplaintDetail> {
+
   await ensureDatabase();
   const row = await getClient().execute({
     sql: `SELECT ${SELECT_COMPLAINT}, f.name AS faculty_name, d.name AS department_name
@@ -623,7 +721,8 @@ export async function getComplaintForUser(user: SessionUser, id: string): Promis
   });
   if (!row.rows[0]) throw new HttpError(404, "Complaint not found.");
   const record = mapComplaint(row.rows[0] as SqlRow);
-  if (!canAccessComplaint(user, record)) throw new HttpError(404, "Complaint not found.");
+  if (!(await mayAccessComplaint(user, record.id, record))) throw new HttpError(404, "Complaint not found.");
+  const assignees = await listAssignees(id);
   const [events, notes, attachments] = await Promise.all([listEvents(id), listNotes(id), listAttachmentMeta(id)]);
   return {
     ...record,
@@ -633,6 +732,7 @@ export async function getComplaintForUser(user: SessionUser, id: string): Promis
     events,
     notes,
     attachments,
+    assignees,
   };
 }
 
@@ -701,7 +801,7 @@ export async function readAttachment(user: SessionUser, attachmentId: string): P
   });
   if (!row.rows[0]) throw new HttpError(404, "Attachment not found.");
   const record = row.rows[0] as SqlRow;
-  const allowed = canAccessComplaint(user, {
+  const allowed = await mayAccessComplaint(user, requiredText(record, "complaint_id"), {
     facultyId: requiredText(record, "faculty_id"),
     departmentId: requiredText(record, "department_id"),
     category: requiredText(record, "category"),
@@ -714,11 +814,18 @@ export async function readAttachment(user: SessionUser, attachmentId: string): P
 export async function applyComplaintAction(
   user: SessionUser,
   id: string,
-  input: { type: "status" | "note" | "respond" | "escalate" | "rotate_secret"; status?: string; message?: string; note?: string; confirmedIdentity?: boolean },
+  input: { type: "status" | "note" | "respond" | "escalate" | "rotate_secret" | "assign"; status?: string; message?: string; note?: string; confirmedIdentity?: boolean; assigneeId?: string },
   appUrl: string,
 ): Promise<{ newSecret?: string }> {
   await ensureDatabase();
+  if (input.type === "assign") {
+    await assignComplaint(user, id, input.assigneeId || "");
+    return {};
+  }
   const detail = await getComplaintForUser(user, id);
+  if (!canHandleComplaint(user)) {
+    throw new HttpError(403, "This account can view the complaint but cannot change it.");
+  }
   if (input.type === "note") {
     const note = input.note?.trim() ?? "";
     if (note.length < 3) throw new HttpError(400, "Write a short internal note.");

@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ComplaintActions } from "@/components/ComplaintActions";
+import { ComplaintAssign } from "@/components/ComplaintAssign";
 import { StatusBadge } from "@/components/StatusBadge";
-import { getComplaintForUser } from "@/lib/complaints";
+import { getComplaintForUser, listAssignableUsers } from "@/lib/complaints";
 import { categoryLabel, semesterLabel } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/current-user";
+import { canAssignComplaint, canHandleComplaint } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
 import { HttpError } from "@/lib/http";
 import { formatBytes, formatDateTime } from "@/lib/format";
@@ -123,15 +125,35 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
             ))}
           </ul>
         </section>
-        <section className="section">
-          <ComplaintActions
-            id={complaint.id}
-            status={complaint.status}
-            anonymous={complaint.isAnonymous}
-            hasEmail={Boolean(complaint.studentEmail)}
-            escalationLevel={complaint.escalationLevel}
+        {canHandleComplaint(user) ? (
+          <section className="section">
+            <ComplaintActions
+              id={complaint.id}
+              status={complaint.status}
+              anonymous={complaint.isAnonymous}
+              hasEmail={Boolean(complaint.studentEmail)}
+              escalationLevel={complaint.escalationLevel}
+            />
+          </section>
+        ) : null}
+        {canAssignComplaint(user) ? (
+          <ComplaintAssign
+            complaintId={complaint.id}
+            people={await listAssignableUsers(user)}
+            assignees={complaint.assignees}
           />
-        </section>
+        ) : complaint.assignees.length > 0 ? (
+          <section className="section">
+            <h2>Assigned officers</h2>
+            <ul>
+              {complaint.assignees.map((item) => (
+                <li key={item.id}>
+                  {item.name} · {item.email}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </>
     );
   } catch (error) {

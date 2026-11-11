@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { recentAudit } from "@/lib/admin";
 import { getCurrentUser } from "@/lib/current-user";
+import { canViewAudit } from "@/lib/rbac";
 import { formatDateTime } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function AuditPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  if (user.role !== "vice_chancellor") redirect("/dashboard");
+  if (!canViewAudit(user)) redirect("/dashboard");
   const rows = await recentAudit(200);
   return (
     <>

@@ -140,6 +140,7 @@ h1 .ur, h2 .ur, .brand-ur { color: inherit; }
 
 .section { margin-top: 1.6rem; }
 .choice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.55rem; }
+.choice-group { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.55rem; }
 .choice {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -173,6 +174,7 @@ input, select, textarea {
   width: 100%;
 }
 textarea { min-height: 140px; resize: vertical; }
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--danger); }
 input:focus-visible, select:focus-visible, textarea:focus-visible, .btn:focus-visible, a:focus-visible, button:focus-visible {
   outline: 3px solid var(--green-900);
   outline-offset: 2px;

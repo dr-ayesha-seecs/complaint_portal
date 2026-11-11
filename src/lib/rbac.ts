@@ -1,7 +1,8 @@
-export const ROLES = ["vice_chancellor", "dean", "chairperson", "staff", "harassment_focal"] as const;
+export const ROLES = ["admin", "vice_chancellor", "dean", "chairperson", "staff", "harassment_focal"] as const;
 export type Role = (typeof ROLES)[number];
 
 export const ROLE_LABELS: Record<Role, string> = {
+  admin: "System administrator",
   vice_chancellor: "Vice Chancellor",
   dean: "Dean",
   chairperson: "Chairperson",
@@ -35,7 +36,7 @@ export function assignmentError(
   departmentId: string | null,
   departmentFacultyId?: string | null,
 ): string | null {
-  if (role === "vice_chancellor" || role === "harassment_focal") {
+  if (role === "admin" || role === "vice_chancellor" || role === "harassment_focal") {
     if (facultyId || departmentId) return "This role covers the whole university and is not tied to one faculty.";
     return null;
   }
@@ -63,9 +64,12 @@ export function assignmentError(
  * Central complaints staff (no faculty and no department) can work every file
  * except harassment. Harassment stays with the Vice Chancellor, the relevant
  * dean and chairperson, and the harassment focal person.
+ * System administrators do not see complaint contents. A user may also gain
+ * access to one file if the Vice Chancellor assigns it to them.
  */
 export function canAccessComplaint(user: SessionUser, complaint: ScopedComplaint): boolean {
   if (!user.active) return false;
+  if (user.role === "admin") return false;
   if (user.role === "vice_chancellor") return true;
   if (user.role === "harassment_focal") return complaint.category === "harassment";
   if (user.role === "dean") return Boolean(user.facultyId) && user.facultyId === complaint.facultyId;
@@ -81,28 +85,51 @@ export function canAccessComplaint(user: SessionUser, complaint: ScopedComplaint
 export function scopeClause(user: SessionUser, alias = "c"): { sql: string; args: string[] } {
   const column = (name: string) => `${alias}.${name}`;
   if (!user.active) return { sql: "0 = 1", args: [] };
+  if (user.role === "admin") return { sql: "0 = 1", args: [] };
   if (user.role === "vice_chancellor") return { sql: "1 = 1", args: [] };
-  if (user.role === "harassment_focal") return { sql: `${column("category")} = 'harassment'`, args: [] };
-  if (user.role === "dean") {
+
+  let roleScope: { sql: string; args: string[] };
+  if (user.role === "harassment_focal") roleScope = { sql: `${column("category")} = 'harassment'`, args: [] };
+  else if (user.role === "dean") {
     if (!user.facultyId) return { sql: "0 = 1", args: [] };
-    return { sql: `${column("faculty_id")} = ?`, args: [user.facultyId] };
-  }
-  if (user.role === "chairperson") {
+    roleScope = { sql: `${column("faculty_id")} = ?`, args: [user.facultyId] };
+  } else if (user.role === "chairperson") {
     if (!user.departmentId) return { sql: "0 = 1", args: [] };
-    return { sql: `${column("department_id")} = ?`, args: [user.departmentId] };
+    roleScope = { sql: `${column("department_id")} = ?`, args: [user.departmentId] };
+  } else if (user.role === "staff") {
+    if (user.departmentId) roleScope = { sql: `${column("department_id")} = ?`, args: [user.departmentId] };
+    else if (user.facultyId) roleScope = { sql: `${column("faculty_id")} = ?`, args: [user.facultyId] };
+    else roleScope = { sql: `${column("category")} != 'harassment'`, args: [] };
+  } else {
+    return { sql: "0 = 1", args: [] };
   }
-  if (user.role === "staff") {
-    if (user.departmentId) return { sql: `${column("department_id")} = ?`, args: [user.departmentId] };
-    if (user.facultyId) return { sql: `${column("faculty_id")} = ?`, args: [user.facultyId] };
-    return { sql: `${column("category")} != 'harassment'`, args: [] };
-  }
-  return { sql: "0 = 1", args: [] };
+
+  return {
+    sql: `(${roleScope.sql} OR EXISTS (SELECT 1 FROM complaint_assignments a WHERE a.complaint_id = ${alias}.id AND a.user_id = ?))`,
+    args: [...roleScope.args, user.id],
+  };
 }
 
 export function canManageDirectory(user: SessionUser): boolean {
-  return user.active && user.role === "vice_chancellor";
+  return user.active && user.role === "admin";
+}
+
+export function canManageUsers(user: SessionUser): boolean {
+  return user.active && user.role === "admin";
 }
 
 export function canViewAudit(user: SessionUser): boolean {
+  return user.active && user.role === "admin";
+}
+
+export function canViewComplaints(user: SessionUser): boolean {
+  return user.active && user.role !== "admin";
+}
+
+export function canHandleComplaint(user: SessionUser): boolean {
+  return user.active && user.role !== "admin" && user.role !== "vice_chancellor";
+}
+
+export function canAssignComplaint(user: SessionUser): boolean {
   return user.active && user.role === "vice_chancellor";
 }
