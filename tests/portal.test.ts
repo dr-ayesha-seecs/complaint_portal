@@ -60,11 +60,18 @@ describe("standards helpers", () => {
     expect(isOverdue(standard.dueAt, "submitted", new Date("2030-01-01T00:00:00.000Z"))).toBe(true);
   });
 
-  it("keeps department emails obviously fake", () => {
+  it("seeds official dean office emails and keeps department emails obviously fake", () => {
     const aids = organisation.find((faculty) => faculty.id === "foc")?.departments.find((dept) => dept.id === "foc-aids");
     expect(aids?.chairpersonName).toBe("Prof. Dr. Ayesha Hakim");
     expect(aids && isPlaceholderEmail(aids.chairpersonEmail)).toBe(true);
-    expect(organisation.every((faculty) => isPlaceholderEmail(faculty.deanEmail))).toBe(true);
+    const official = ["faes", "ffhs", "fssh", "fvas", "fabset", "foc"] as const;
+    for (const id of official) {
+      const row = organisation.find((faculty) => faculty.id === id);
+      expect(row?.deanEmail).toBe(`dean.${id}@mnsuam.edu.pk`);
+      expect(row && isPlaceholderEmail(row.deanEmail)).toBe(false);
+    }
+    const admin = organisation.find((faculty) => faculty.id === "admin");
+    expect(admin && isPlaceholderEmail(admin.deanEmail)).toBe(true);
   });
 });
 

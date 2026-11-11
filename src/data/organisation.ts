@@ -34,6 +34,15 @@ function department(
   };
 }
 
+const OFFICIAL_DEAN_EMAILS: Record<string, string> = {
+  faes: "dean.faes@mnsuam.edu.pk",
+  ffhs: "dean.ffhs@mnsuam.edu.pk",
+  fssh: "dean.fssh@mnsuam.edu.pk",
+  fvas: "dean.fvas@mnsuam.edu.pk",
+  fabset: "dean.fabset@mnsuam.edu.pk",
+  foc: "dean.foc@mnsuam.edu.pk",
+};
+
 function faculty(
   id: string,
   name: string,
@@ -47,16 +56,17 @@ function faculty(
     name,
     nameUr,
     deanName,
-    deanEmail: `placeholder+${id}-dean@mnsuam.invalid`,
+    deanEmail: OFFICIAL_DEAN_EMAILS[id] ?? `placeholder+${id}-dean@mnsuam.invalid`,
     departments,
   };
 }
 
 /**
  * Seed structure drawn from the MNSUAM website and the 2025 undergraduate prospectus.
- * Every address is a deliberate placeholder on the reserved `.invalid` domain.
- * Replace them in Dashboard → Contacts after the first boot. The database, not this
- * file, is the source of truth once rows exist.
+ * The six academic faculties use official dean office addresses (dean.<faculty>@mnsuam.edu.pk).
+ * Department chairs and University Administration remain placeholders on the reserved
+ * `.invalid` domain until they are replaced in Dashboard → Contacts. The database, not
+ * this file, is the source of truth once rows exist.
  */
 export const organisation: FacultySeed[] = [
   faculty(
