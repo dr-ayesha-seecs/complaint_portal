@@ -18,7 +18,8 @@ export function UsersAdmin({ users, directory }: { users: SessionUser[]; directo
   async function create(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
-    const form = new FormData(event.currentTarget);
+    const formEl = event.currentTarget;
+    const form = new FormData(formEl);
     const response = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -36,7 +37,7 @@ export function UsersAdmin({ users, directory }: { users: SessionUser[]; directo
       setError(body?.error || "The account could not be created.");
       return;
     }
-    event.currentTarget.reset();
+    formEl.reset();
     router.refresh();
   }
 
