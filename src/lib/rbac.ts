@@ -133,3 +133,7 @@ export function canHandleComplaint(user: SessionUser): boolean {
 export function canAssignComplaint(user: SessionUser): boolean {
   return user.active && user.role === "vice_chancellor";
 }
+
+export function canViewVisitStats(user: SessionUser): boolean {
+  return user.active && (user.role === "admin" || user.role === "vice_chancellor");
+}

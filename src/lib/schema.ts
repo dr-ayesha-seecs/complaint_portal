@@ -1,3 +1,5 @@
+export const SCHEMA_VERSION = "002_page_visits";
+
 export const SCHEMA_STATEMENTS: string[] = [
   `CREATE TABLE IF NOT EXISTS schema_migrations (
     id TEXT PRIMARY KEY,
@@ -166,4 +168,19 @@ export const SCHEMA_STATEMENTS: string[] = [
   )`,
   `CREATE INDEX IF NOT EXISTS idx_assignments_user ON complaint_assignments(user_id)`,
   `CREATE INDEX IF NOT EXISTS idx_assignments_complaint ON complaint_assignments(complaint_id)`,
+];
+
+/** Applied after 001_init on existing databases, without re-running the original DDL. */
+export const LATER_MIGRATIONS: { id: string; statements: string[] }[] = [
+  {
+    id: "002_page_visits",
+    statements: [
+      `CREATE TABLE IF NOT EXISTS page_visit_counts (
+        day TEXT NOT NULL,
+        path TEXT NOT NULL,
+        count INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (day, path)
+      )`,
+    ],
+  },
 ];

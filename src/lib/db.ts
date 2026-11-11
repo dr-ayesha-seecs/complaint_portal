@@ -6,7 +6,7 @@ import { organisation } from "@/data/organisation";
 import { isPlaceholderEmail } from "./ids";
 import { assertPasswordStrength, hashPassword } from "./password";
 import { isRole, assignmentError, type Role } from "./rbac";
-import { SCHEMA_STATEMENTS } from "./schema";
+import { LATER_MIGRATIONS, SCHEMA_STATEMENTS } from "./schema";
 
 let client: Client | null = null;
 let ready: Promise<void> | null = null;
@@ -54,21 +54,46 @@ export async function ensureDatabase(): Promise<void> {
   await ready;
 }
 
+async function appliedMigrations(): Promise<Set<string>> {
+  try {
+    const result = await getClient().execute("SELECT id FROM schema_migrations");
+    return new Set(result.rows.map((row) => String(row.id)));
+  } catch {
+    return new Set();
+  }
+}
+
+async function recordMigration(id: string): Promise<void> {
+  await getClient().execute({
+    sql: "INSERT INTO schema_migrations (id, applied_at) VALUES (?, ?) ON CONFLICT(id) DO NOTHING",
+    args: [id, new Date().toISOString()],
+  });
+}
+
 async function initialise(): Promise<void> {
   const db = getClient();
   await db.execute("PRAGMA foreign_keys = ON");
-  for (const statement of SCHEMA_STATEMENTS) {
-    await db.execute(statement);
+  const applied = await appliedMigrations();
+  // Production already has 001_init: skip the original 26 remote DDL statements,
+  // seeding, and placeholder scans. Still apply any later migrations.
+  if (!applied.has("001_init")) {
+    for (const statement of SCHEMA_STATEMENTS) {
+      await db.execute(statement);
+    }
+    await recordMigration("001_init");
+    await seedOrganisation();
+    await seedSettings();
+    await bootstrapUsers();
+    await warnPlaceholders();
+    applied.add("001_init");
   }
-  const now = new Date().toISOString();
-  await db.execute({
-    sql: "INSERT INTO schema_migrations (id, applied_at) VALUES ('001_init', ?) ON CONFLICT(id) DO NOTHING",
-    args: [now],
-  });
-  await seedOrganisation();
-  await seedSettings();
-  await bootstrapUsers();
-  await warnPlaceholders();
+  for (const migration of LATER_MIGRATIONS) {
+    if (applied.has(migration.id)) continue;
+    for (const statement of migration.statements) {
+      await db.execute(statement);
+    }
+    await recordMigration(migration.id);
+  }
 }
 
 async function seedOrganisation(): Promise<void> {

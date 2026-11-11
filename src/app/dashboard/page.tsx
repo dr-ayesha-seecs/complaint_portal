@@ -5,7 +5,9 @@ import { getDashboard } from "@/lib/complaints";
 import { categoryLabel } from "@/lib/categories";
 import { formatDateTime } from "@/lib/format";
 import { redirect } from "next/navigation";
-import { canManageDirectory, canViewComplaints } from "@/lib/rbac";
+import { canManageDirectory, canViewComplaints, canViewVisitStats } from "@/lib/rbac";
+import { VisitStats } from "@/components/VisitStats";
+import { visitStats } from "@/lib/visits";
 import { listUsers } from "@/lib/auth";
 import { listDirectory } from "@/lib/admin";
 
@@ -48,6 +50,7 @@ export default async function DashboardPage() {
             <Link href="/dashboard/contacts">Update contacts</Link>.
           </p>
         ) : null}
+        {canViewVisitStats(user) ? <VisitStats {...(await visitStats())} /> : null}
       </>
     );
   }
@@ -151,6 +154,7 @@ export default async function DashboardPage() {
           </table>
         </div>
       </section>
+      {canViewVisitStats(user) ? <VisitStats {...(await visitStats())} /> : null}
     </>
   );
 }

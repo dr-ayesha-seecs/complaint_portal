@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { beforeAll, describe, expect, it } from "vitest";
-import { organisation } from "../src/data/organisation";
+import { organisation, toPublicOrg } from "../src/data/organisation";
 import { staffEmail } from "../src/lib/email-templates";
 import { csvCell } from "../src/lib/csv";
 import { isPlaceholderEmail } from "../src/lib/ids";
-import { canAccessComplaint, canAssignComplaint, canHandleComplaint, canManageDirectory, canManageUsers, canViewAudit, canViewComplaints, scopeClause, type SessionUser } from "../src/lib/rbac";
+import { canAccessComplaint, canAssignComplaint, canHandleComplaint, canManageDirectory, canManageUsers, canViewAudit, canViewComplaints, canViewVisitStats, scopeClause, type SessionUser } from "../src/lib/rbac";
 import { buildRecipientList } from "../src/lib/routing";
 import { addWorkingDays, computeSla, isOverdue } from "../src/lib/sla";
 import { complaintSchema } from "../src/lib/validation";
@@ -350,5 +350,47 @@ describe("complaint flow", () => {
     const assigned = await getComplaintForUser(csChair, academicId);
     expect(assigned.trackingNumber).toBe(created.trackingNumber);
     expect(assigned.assignees.some((item) => item.id === csChair.id)).toBe(true);
+  });
+});
+
+describe("public organisation and portal visits", () => {
+  it("lists faculties and departments from the bundled seed without contact emails", () => {
+    const org = toPublicOrg();
+    expect(org.faculties.map((faculty) => faculty.id)).toEqual(organisation.map((faculty) => faculty.id));
+    expect(org.faculties.every((faculty) => faculty.departments.length > 0)).toBe(true);
+    const aids = org.faculties.find((faculty) => faculty.id === "foc")?.departments.find((dept) => dept.id === "foc-aids");
+    expect(aids?.name).toBe("Department of Artificial Intelligence and Data Science");
+    expect(aids && "chairpersonEmail" in aids).toBe(false);
+  });
+
+  it("lets the vice chancellor and a system administrator see visit counts, but not a chairperson", () => {
+    const base = { id: "1", email: "staff@example.com", name: "Staff", facultyId: null, departmentId: null, active: true };
+    expect(canViewVisitStats({ ...base, role: "vice_chancellor" })).toBe(true);
+    expect(canViewVisitStats({ ...base, role: "admin" })).toBe(true);
+    expect(canViewVisitStats({ ...base, role: "chairperson", facultyId: "foc", departmentId: "foc-aids" })).toBe(false);
+    expect(canViewVisitStats({ ...base, role: "admin", active: false })).toBe(false);
+  });
+
+  it("records visits by Karachi day, rejects unknown paths, and stores no personal fields", async () => {
+    const { ensureDatabase, getClient, resetClient } = await import("../src/lib/db");
+    const { karachiDay, recordVisit, visitStats } = await import("../src/lib/visits");
+    const { HttpError } = await import("../src/lib/http");
+    await ensureDatabase();
+    const before = await visitStats();
+    await recordVisit("/");
+    await recordVisit("/submit");
+    const after = await visitStats();
+    expect(after.total).toBe(before.total + 2);
+    expect(after.today).toBe(before.today + 2);
+    await expect(recordVisit("/login")).rejects.toBeInstanceOf(HttpError);
+    const info = await getClient().execute("PRAGMA table_info(page_visit_counts)");
+    const columns = info.rows.map((row) => String(row.name));
+    expect(columns).toEqual(expect.arrayContaining(["day", "path", "count"]));
+    expect(columns.some((name) => /ip|email|name|user|address/i.test(name))).toBe(false);
+    expect(karachiDay(new Date("2026-11-11T20:00:00.000Z"))).toBe("2026-11-12");
+    await resetClient();
+    await ensureDatabase();
+    const migrations = await getClient().execute("SELECT id FROM schema_migrations ORDER BY id");
+    expect(migrations.rows.map((row) => String(row.id))).toEqual(["001_init", "002_page_visits"]);
   });
 });

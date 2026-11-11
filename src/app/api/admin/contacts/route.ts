@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { addDepartment, updateDepartmentContact, updateFacultyContact, updateHarassmentContacts } from "@/lib/admin";
+import { revalidatePublicOrganisation } from "@/lib/public-org";
 import { requireUser } from "@/lib/current-user";
 import { assertSameOrigin, readJson, toErrorResponse } from "@/lib/http";
 
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
     } else {
       return NextResponse.json({ error: "Unknown action." }, { status: 400 });
     }
+    if (body.action !== "harassment") revalidatePublicOrganisation();
     return NextResponse.json({ ok: true });
   } catch (error) {
     return toErrorResponse(error);

@@ -2,16 +2,18 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { CATEGORIES, CATEGORY_HINTS, PROGRAMME_SUGGESTIONS, SEMESTERS, semesterLabel, type CategoryId } from "@/lib/categories";
+import { useSearchParams } from "next/navigation";
+import { CATEGORIES, CATEGORY_IDS, CATEGORY_HINTS, PROGRAMME_SUGGESTIONS, SEMESTERS, semesterLabel, type CategoryId } from "@/lib/categories";
 import { complaintSchema } from "@/lib/validation";
 
 type Org = { id: string; name: string; departments: { id: string; name: string }[] }[];
 
 type Success = { trackingNumber: string; secretKey: string; dueAt: string; emailed: boolean };
 
-export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset: string; turnstileSiteKey: string }) {
-  const [category, setCategory] = useState<string>(preset);
-  const [anonymous, setAnonymous] = useState(preset !== "harassment");
+export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteKey: string }) {
+  const searchParams = useSearchParams();
+  const [category, setCategory] = useState("");
+  const [anonymous, setAnonymous] = useState(true);
   const [facultyId, setFacultyId] = useState(org[0]?.id ?? "");
   const [departmentId, setDepartmentId] = useState(org[0]?.departments[0]?.id ?? "");
   const [error, setError] = useState("");
@@ -32,6 +34,13 @@ export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset
       script.remove();
     };
   }, [turnstileSiteKey]);
+
+  useEffect(() => {
+    const raw = searchParams.get("category") || "";
+    const next = CATEGORY_IDS.includes(raw as CategoryId) ? raw : "";
+    setCategory(next);
+    setAnonymous(next !== "harassment");
+  }, [searchParams]);
 
   useEffect(() => {
     if (!error) return;
