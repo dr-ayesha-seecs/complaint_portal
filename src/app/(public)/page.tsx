@@ -11,10 +11,7 @@ export default function HomePage() {
           <p className="brand-kicker" style={{ color: "var(--gold)" }}>
             Muhammad Nawaz Sharif University of Agriculture
           </p>
-          <h1>
-            A recorded way to raise a student complaint
-            <span className="ur">طلبہ کے لیے شکایت درج کرنے کا باضابطہ راستہ</span>
-          </h1>
+          <h1>A recorded way to raise a student complaint</h1>
           <hr className="gold-rule" />
           <p className="lede">
             Use this portal for teaching, assessment, fees, hostels, facilities, discrimination, ragging, harassment, access, or anything else that is getting in the way of your studies.
@@ -46,7 +43,6 @@ export default function HomePage() {
 
       <section className="section">
         <h2>What you can complain about</h2>
-        <p className="ur">آپ کس بارے میں شکایت کر سکتے ہیں</p>
         {groups.map((group) => (
           <div key={group}>
             <h3>{group}</h3>
@@ -54,7 +50,6 @@ export default function HomePage() {
               {CATEGORIES.filter((item) => item.group === group).map((item) => (
                 <Link key={item.id} className="card" href={`/submit?category=${item.id}`}>
                   <strong>{item.en}</strong>
-                  <span className="ur">{item.ur}</span>
                 </Link>
               ))}
             </div>

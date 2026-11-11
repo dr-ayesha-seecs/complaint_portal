@@ -24,7 +24,6 @@ export async function listDirectory(): Promise<FacultyContact[]> {
     return {
       id,
       name: requiredText(faculty, "name"),
-      nameUr: requiredText(faculty, "name_ur"),
       deanName: requiredText(faculty, "dean_name"),
       deanEmail: requiredText(faculty, "dean_email"),
       emailIsPlaceholder: flag(faculty, "email_is_placeholder"),
@@ -35,13 +34,12 @@ export async function listDirectory(): Promise<FacultyContact[]> {
   });
 }
 
-export async function publicOrganisation(): Promise<{ id: string; name: string; nameUr: string; departments: { id: string; name: string; nameUr: string }[] }[]> {
+export async function publicOrganisation(): Promise<{ id: string; name: string; departments: { id: string; name: string }[] }[]> {
   const directory = await listDirectory();
   return directory.map((faculty) => ({
     id: faculty.id,
     name: faculty.name,
-    nameUr: faculty.nameUr,
-    departments: faculty.departments.map((dept) => ({ id: dept.id, name: dept.name, nameUr: dept.nameUr })),
+    departments: faculty.departments.map((dept) => ({ id: dept.id, name: dept.name })),
   }));
 }
 
@@ -50,7 +48,6 @@ function mapDepartment(row: SqlRow): DepartmentContact {
     id: requiredText(row, "id"),
     facultyId: requiredText(row, "faculty_id"),
     name: requiredText(row, "name"),
-    nameUr: requiredText(row, "name_ur"),
     chairpersonName: requiredText(row, "chairperson_name"),
     chairpersonEmail: requiredText(row, "chairperson_email"),
     emailIsPlaceholder: flag(row, "email_is_placeholder"),
@@ -111,7 +108,7 @@ export async function updateDepartmentContact(
 
 export async function addDepartment(
   user: SessionUser,
-  input: { facultyId: string; name: string; nameUr: string; chairpersonName: string; chairpersonEmail: string },
+  input: { facultyId: string; name: string; chairpersonName: string; chairpersonEmail: string },
 ): Promise<void> {
   assertVc(user);
   await ensureDatabase();
@@ -143,7 +140,7 @@ export async function addDepartment(
       input.facultyId,
       id.toUpperCase(),
       name,
-      input.nameUr.trim(),
+      "",
       chair,
       email,
       placeholderFlag(email),

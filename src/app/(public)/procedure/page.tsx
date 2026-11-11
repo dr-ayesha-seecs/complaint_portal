@@ -8,10 +8,7 @@ export default function ProcedurePage() {
   return (
     <div className="wrap">
       <article className="panel">
-        <h1>
-          How a complaint is handled
-          <span className="ur">شکایت نمٹانے کا طریقہ</span>
-        </h1>
+        <h1>How a complaint is handled</h1>
         <p>
           This procedure is the university&apos;s online system of grievance redressal. It follows the HEC expectation that a student can file a complaint on the university portal, receive a reference number, and see the status. It also follows the HEC Policy on Protection Against Sexual Harassment in Higher Education Institutions (effective 1 July 2020), the Protection against Harassment of Women at the Workplace Act, 2010, the spirit of the UK Office of the Independent Adjudicator Good Practice Framework, and ISO 10002 on complaints handling.
         </p>

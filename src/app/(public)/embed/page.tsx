@@ -10,7 +10,7 @@ export default async function EmbedPage() {
   const proto = headerList.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
   const origin = (process.env.NEXT_PUBLIC_APP_URL || `${proto}://${host}`).replace(/\/$/, "");
   const snippet = `<a class="mnsuam-complaint-link" href="${origin}/submit">File a student complaint</a>`;
-  const button = `<a class="mnsuam-complaint-button" href="${origin}/submit">File a student complaint · شکایت درج کریں</a>
+  const button = `<a class="mnsuam-complaint-button" href="${origin}/submit">File a student complaint</a>
 <style>
   .mnsuam-complaint-button {
     display: inline-block;
@@ -38,7 +38,7 @@ export default async function EmbedPage() {
         <h2>Button</h2>
         <p>
           <a className="btn" href="/submit">
-            File a student complaint · شکایت درج کریں
+            File a student complaint
           </a>
         </p>
         <pre className="card">{button}</pre>

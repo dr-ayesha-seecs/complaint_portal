@@ -70,10 +70,7 @@ export function TrackPanel() {
 
   return (
     <div className="panel">
-      <h1>
-        Track a complaint
-        <span className="ur">شکایت کی صورتحال</span>
-      </h1>
+      <h1>Track a complaint</h1>
       <p>Enter the tracking number and the secret key from your acknowledgement. Staff cannot look the key up for an anonymous complaint.</p>
       <form onSubmit={lookup} className="fields">
         {error ? (

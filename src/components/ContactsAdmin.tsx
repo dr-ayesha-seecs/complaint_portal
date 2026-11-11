@@ -75,10 +75,7 @@ export function ContactsAdmin({ directory, harassment }: { directory: FacultyCon
 
       {directory.map((faculty) => (
         <section className="section" key={faculty.id}>
-          <h2>
-            {faculty.name}
-            <span className="ur">{faculty.nameUr}</span>
-          </h2>
+          <h2>{faculty.name}</h2>
           <form
             className="card grid-2"
             onSubmit={(event) => {
@@ -120,10 +117,7 @@ export function ContactsAdmin({ directory, harassment }: { directory: FacultyCon
                 });
               }}
             >
-              <strong>
-                {department.name}
-                <span className="ur">{department.nameUr}</span>
-              </strong>
+              <strong>{department.name}</strong>
               <span />
               <div className="field">
                 <label htmlFor={`chair-name-${department.id}`}>Chairperson or office</label>
@@ -150,7 +144,6 @@ export function ContactsAdmin({ directory, harassment }: { directory: FacultyCon
                 action: "add-department",
                 facultyId: faculty.id,
                 name: String(form.get("name") || ""),
-                nameUr: String(form.get("nameUr") || ""),
                 chairpersonName: String(form.get("chairpersonName") || ""),
                 chairpersonEmail: String(form.get("chairpersonEmail") || ""),
               });
@@ -160,7 +153,6 @@ export function ContactsAdmin({ directory, harassment }: { directory: FacultyCon
             <h3>Add a department</h3>
             <div className="grid-2">
               <input name="name" aria-label="New department name" placeholder="Department name" required />
-              <input name="nameUr" aria-label="Urdu name" placeholder="Urdu name (optional)" />
               <input name="chairpersonName" aria-label="Chairperson name" placeholder="Chairperson or office" required />
               <input name="chairpersonEmail" aria-label="Chairperson email" type="email" placeholder="placeholder+unit-chair@mnsuam.invalid" required />
             </div>

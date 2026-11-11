@@ -138,7 +138,7 @@ export default async function DashboardPage() {
                   </td>
                   <td data-label="Subject">
                     {item.subject}
-                    <span className="ur">{categoryLabel(item.category)}</span>
+                    <span className="sub">{categoryLabel(item.category)}</span>
                   </td>
                   <td data-label="Department">{item.departmentName}</td>
                   <td data-label="Status">

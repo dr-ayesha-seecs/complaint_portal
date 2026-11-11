@@ -150,15 +150,15 @@ export default async function ComplaintsPage({
               <tr key={item.id}>
                 <td data-label="Tracking">
                   <Link href={`/dashboard/complaints/${item.id}`}>{item.trackingNumber}</Link>
-                  {item.category === "harassment" ? <span className="ur">Confidential</span> : null}
+                  {item.category === "harassment" ? <span className="sub">Confidential</span> : null}
                 </td>
                 <td data-label="Subject">
                   {item.subject}
-                  <span className="ur">{categoryLabel(item.category)}</span>
+                  <span className="sub">{categoryLabel(item.category)}</span>
                 </td>
                 <td data-label="Where">
                   {item.departmentName}
-                  <span className="ur">{item.facultyName}</span>
+                  <span className="sub">{item.facultyName}</span>
                 </td>
                 <td data-label="Student">{item.isAnonymous ? "Anonymous" : item.studentName || "Named"}</td>
                 <td data-label="Status">

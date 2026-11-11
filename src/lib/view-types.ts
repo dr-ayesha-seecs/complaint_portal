@@ -2,7 +2,6 @@ export type DepartmentContact = {
   id: string;
   facultyId: string;
   name: string;
-  nameUr: string;
   chairpersonName: string;
   chairpersonEmail: string;
   emailIsPlaceholder: boolean;
@@ -11,7 +10,6 @@ export type DepartmentContact = {
 export type FacultyContact = {
   id: string;
   name: string;
-  nameUr: string;
   deanName: string;
   deanEmail: string;
   emailIsPlaceholder: boolean;

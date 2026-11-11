@@ -7,10 +7,7 @@ export default function PrivacyPage() {
   return (
     <div className="wrap">
       <article className="panel">
-        <h1>
-          Privacy notice
-          <span className="ur">رازداری کا نوٹس</span>
-        </h1>
+        <h1>Privacy notice</h1>
         <p>
           This notice explains what the Students Complaints Portal of MNS University of Agriculture, Multan does with personal information. The portal is operated for the university so that students can raise complaints and the university can respond. It is not a public noticeboard.
         </p>

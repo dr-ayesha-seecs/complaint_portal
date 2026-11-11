@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CATEGORIES, CATEGORY_HINTS, PROGRAMME_SUGGESTIONS, SEMESTERS, semesterLabel, type CategoryId } from "@/lib/categories";
 import { complaintSchema } from "@/lib/validation";
 
-type Org = { id: string; name: string; nameUr: string; departments: { id: string; name: string; nameUr: string }[] }[];
+type Org = { id: string; name: string; departments: { id: string; name: string }[] }[];
 
 type Success = { trackingNumber: string; secretKey: string; dueAt: string; emailed: boolean };
 
@@ -156,11 +156,8 @@ export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset
 
   return (
     <form className="panel" onSubmit={onSubmit} noValidate>
-      <h1>
-        File a complaint
-        <span className="ur">شکایت درج کریں</span>
-      </h1>
-      <p>Fields marked required must be completed. You can write in English or Urdu.</p>
+      <h1>File a complaint</h1>
+      <p>Fields marked required must be completed.</p>
       {error ? (
         <div className="error-summary" role="alert" tabIndex={-1} ref={summaryRef}>
           <strong>{error}</strong>
@@ -194,7 +191,6 @@ export function SubmitForm({ org, preset, turnstileSiteKey }: { org: Org; preset
                   />
                   <span>
                     {item.en}
-                    <span className="ur">{item.ur}</span>
                   </span>
                 </label>
               ))}

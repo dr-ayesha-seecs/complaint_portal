@@ -165,5 +165,5 @@ Suggested menu label: **Student complaints**.
 - Retention stated in the privacy notice (3 years for ordinary files, 7 years for harassment files) is a proposed rule for the Registrar to confirm. The software does not delete files on a timer.
 - The privacy notice and procedure should be read by the Registrar before the portal is announced. They describe how this software behaves; they are not a substitute for a signed university statute.
 - CSV export and attachment download are limited to staff who may already open that complaint. Students keep their own copies of attachments. The tracking page does not offer a second download link, so the secret key is never used as a file URL.
-- No third-party analytics or font CDN is loaded. Urdu labels use the reader’s own Urdu fonts.
+- No third-party analytics or font CDN is loaded. The portal is English only.
 - `npm run build` does not need a database. Pages that read complaints are rendered on request.

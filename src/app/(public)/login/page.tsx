@@ -12,10 +12,7 @@ export default async function LoginPage() {
   return (
     <div className="wrap">
       <article className="panel" style={{ maxWidth: 560 }}>
-        <h1>
-          Staff login
-          <span className="ur">عملے کے لیے داخلہ</span>
-        </h1>
+        <h1>Staff login</h1>
         <p>Vice Chancellor, deans, chairpersons, complaints staff, and the harassment focal person sign in here. Students do not need an account. Use Track instead.</p>
         <LoginForm />
       </article>

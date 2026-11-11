@@ -22,7 +22,6 @@ export async function POST(req: Request) {
       await addDepartment(user, {
         facultyId: body.facultyId || "",
         name: body.name || "",
-        nameUr: body.nameUr || "",
         chairpersonName: body.chairpersonName || "",
         chairpersonEmail: body.chairpersonEmail || "",
       });
