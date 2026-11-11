@@ -9,12 +9,12 @@ export default function PrivacyPage() {
       <article className="panel">
         <h1>Privacy notice</h1>
         <p>
-          This notice explains what the Students Complaints Portal of MNS University of Agriculture, Multan does with personal information. The portal is operated for the university so that students can raise complaints and the university can respond. It is not a public noticeboard.
+          This notice explains what the Students Complaints Portal of Muhammad Nawaz Shareef University of Agriculture, Multan does with personal information. The portal is operated for the university so that students can raise complaints and the university can respond. It is not a public noticeboard.
         </p>
 
         <h2>Who is responsible</h2>
         <p>
-          MNS University of Agriculture, Multan, University Road, Multan. Questions about this notice can go to the Registrar or the Directorate of Students Affairs through the university exchange, 061-9201541, or info@mnsuam.edu.pk. The portal owner inside the university is the Chairperson, Department of Artificial Intelligence and Data Science, Prof. Dr. Ayesha Hakim.
+          Muhammad Nawaz Shareef University of Agriculture, Multan, University Road, Multan. Questions about this notice can go to the Registrar or the Directorate of Students Affairs through the university exchange, 061-9201541, or info@mnsuam.edu.pk. The portal owner inside the university is the Chairperson, Department of Artificial Intelligence and Data Science, Prof. Dr. Ayesha Hakim.
         </p>
 
         <h2>What we collect</h2>

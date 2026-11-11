@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { UNIVERSITY_NAME } from "@/lib/university";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -18,13 +19,17 @@ export function SiteHeader() {
     <header className="topbar">
       <div className="topbar-inner">
         <div className="brand-row">
-          <div className="mark" aria-hidden="true">
-            MNS
-          </div>
-          <div>
-            <p className="brand-kicker">MNS University of Agriculture, Multan</p>
+          <Link href="/" className="brand-home">
+            {/* Official header wordmark: https://www.mnsuam.edu.pk/images/logos/logo-mnsuam.png */}
+            <img
+              className="brand-logo"
+              src="/logo-mnsuam.png"
+              width={236}
+              height={59}
+              alt={UNIVERSITY_NAME}
+            />
             <p className="brand-title">Students Complaints Portal</p>
-          </div>
+          </Link>
         </div>
         <nav className="nav" aria-label="Primary">
           {LINKS.map((link) => (

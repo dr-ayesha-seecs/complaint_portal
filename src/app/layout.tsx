@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
+import { UNIVERSITY_NAME, UNIVERSITY_SHORT } from "@/lib/university";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Students Complaints Portal | MNSUAM",
-    template: "%s | MNSUAM Complaints",
+    default: `Students Complaints Portal | ${UNIVERSITY_NAME}`,
+    template: `%s | ${UNIVERSITY_SHORT} Complaints`,
   },
-  description:
-    "File and track a student complaint at MNS University of Agriculture, Multan. Confidential handling, a tracking number, and published response times.",
+  description: `File and track a student complaint at ${UNIVERSITY_NAME}. Confidential handling, a tracking number, and published response times.`,
   robots: { index: true, follow: true },
 };
 

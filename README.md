@@ -1,6 +1,6 @@
 # MNSUAM Students Complaints Portal
 
-Online grievance redressal for students of **MNS University of Agriculture, Multan** (Muhammad Nawaz Sharif University of Agriculture). The portal is meant to be linked from [mnsuam.edu.pk](https://mnsuam.edu.pk). It gives every complaint a tracking number, a published time limit, a status the student can check, and a route to the right chairperson and dean.
+Online grievance redressal for students of **Muhammad Nawaz Shareef University of Agriculture, Multan** (MNSUAM). The portal is meant to be linked from [mnsuam.edu.pk](https://mnsuam.edu.pk). It gives every complaint a tracking number, a published time limit, a status the student can check, and a route to the right chairperson and dean.
 
 The portal owner is **Prof. Dr. Ayesha Hakim**, Chairperson, Department of Artificial Intelligence and Data Science.
 

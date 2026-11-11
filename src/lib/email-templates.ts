@@ -1,6 +1,7 @@
 import { categoryLabel } from "./categories";
 import { formatDateTime } from "./format";
 import type { RecipientRole } from "./routing";
+import { UNIVERSITY_NAME, UNIVERSITY_SHORT } from "./university";
 
 const ROLE_LINE: Record<RecipientRole, string> = {
   chairperson: "You are receiving this because you are recorded as the chairperson of the department.",
@@ -49,7 +50,7 @@ export function staffEmail(input: {
         `Sign in: ${input.appUrl}/login`,
         `Complaint desk: ${link}`,
         "",
-        "MNS University of Agriculture, Multan",
+        UNIVERSITY_NAME,
         "Students Complaints Portal",
       ]
         .filter((line) => line !== "")
@@ -83,7 +84,7 @@ export function staffEmail(input: {
       "",
       "Keep this message limited to staff who need it to deal with the complaint.",
       "",
-      "MNS University of Agriculture, Multan",
+      UNIVERSITY_NAME,
       "Students Complaints Portal",
     ]
       .filter((line) => line !== "")
@@ -100,9 +101,9 @@ export function studentEmail(input: {
   harassment: boolean;
 }): { subject: string; text: string } {
   return {
-    subject: `MNSUAM complaint received — ${input.trackingNumber}`,
+    subject: `${UNIVERSITY_SHORT} complaint received — ${input.trackingNumber}`,
     text: [
-      "Your complaint has been received by MNS University of Agriculture, Multan.",
+      `Your complaint has been received by ${UNIVERSITY_NAME}.`,
       "",
       `Tracking number: ${input.trackingNumber}`,
       `Secret key: ${input.secretKey}`,
@@ -121,7 +122,7 @@ export function studentEmail(input: {
       "",
       "If you are in immediate danger, contact campus security or the police. This mailbox is not an emergency service.",
       "",
-      "MNS University of Agriculture, Multan",
+      UNIVERSITY_NAME,
       "University Road, Multan",
     ].join("\n"),
   };
@@ -143,7 +144,7 @@ export function studentUpdateEmail(input: {
       "",
       `Track the complaint with your tracking number and secret key: ${input.appUrl}/track`,
       "",
-      "MNS University of Agriculture, Multan",
+      UNIVERSITY_NAME,
     ].join("\n"),
   };
 }

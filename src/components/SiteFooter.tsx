@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { UNIVERSITY_NAME } from "@/lib/university";
 
 export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="topbar-inner footer-grid">
         <div>
-          <strong>MNS University of Agriculture, Multan</strong>
+          <strong>{UNIVERSITY_NAME}</strong>
           <p>University Road, Multan, Pakistan</p>
           <p>University exchange: 061-9201541 · info@mnsuam.edu.pk</p>
           <p>
