@@ -4,7 +4,7 @@ Online grievance redressal for students of **Muhammad Nawaz Shareef University o
 
 The portal owner is **Prof. Dr. Ayesha Hakim**, Chairperson, Department of Artificial Intelligence and Data Science.
 
-This repository does not deploy the portal. Set the environment variables below and deploy it yourself to Vercel or Netlify.
+This repository does not deploy the portal. Set the environment variables below and deploy it yourself to Vercel or Netlify. Current branch, commits, and pending hosting decisions are in **[HANDOVER.md](HANDOVER.md)**. The canonical brief for the website, FIS, and this portal is on the university website repo (branch `cursor/mnsuam-preview-upload-b950`).
 
 ## What a student can do
 
