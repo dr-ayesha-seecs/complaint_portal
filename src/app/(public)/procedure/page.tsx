@@ -16,7 +16,7 @@ export default function ProcedurePage() {
 
         <h2>1. Filing and acknowledgement</h2>
         <p>
-          You choose a category, your faculty and department, your programme and semester, and describe what happened and what you want done. Your name is required for verification and will remain strictly confidential. You may attach up to two files (PDF, PNG, JPEG, WEBP, or DOCX, 1 MB each). The portal issues a tracking number immediately. That is the reference you should quote. If you give an email address, the same acknowledgement is sent there, together with a secret key.
+          You choose a category, your faculty and department, and describe what happened and what you want done. Your name, programme, semester, email, and mobile number are required for verification and will remain strictly confidential. You may attach up to two files (PDF, PNG, JPEG, WEBP, or DOCX, 1 MB each). The portal issues a tracking number immediately. That is the reference you should quote. An acknowledgement, including the secret key, is sent to the email address you give.
         </p>
 
         <h2>2. Ordinary complaints</h2>

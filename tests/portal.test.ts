@@ -30,7 +30,7 @@ const base = {
   studentName: "Test Student",
   registrationNumber: "",
   studentEmail: "student@example.com",
-  studentPhone: "",
+  studentPhone: "03001234567",
   confirmTruth: true,
   confirmPrivacy: true,
   confirmNonRetaliation: true,
@@ -94,6 +94,44 @@ describe("complaint validation", () => {
       expect(parsed.success).toBe(false);
       if (!parsed.success) {
         expect(parsed.error.issues.some((issue) => issue.path.includes("studentName"))).toBe(true);
+      }
+    }
+  });
+
+  it("rejects a missing or whitespace-only programme", () => {
+    for (const programme of ["", " "]) {
+      const parsed = complaintSchema.safeParse({ ...base, programme });
+      expect(parsed.success).toBe(false);
+      if (!parsed.success) {
+        expect(parsed.error.issues.some((issue) => issue.path.includes("programme"))).toBe(true);
+      }
+    }
+  });
+
+  it("rejects a missing semester", () => {
+    const parsed = complaintSchema.safeParse({ ...base, semester: "" });
+    expect(parsed.success).toBe(false);
+    if (!parsed.success) {
+      expect(parsed.error.issues.some((issue) => issue.path.includes("semester"))).toBe(true);
+    }
+  });
+
+  it("rejects a missing or invalid email", () => {
+    for (const studentEmail of ["", "  ", "not-an-email"]) {
+      const parsed = complaintSchema.safeParse({ ...base, studentEmail });
+      expect(parsed.success).toBe(false);
+      if (!parsed.success) {
+        expect(parsed.error.issues.some((issue) => issue.path.includes("studentEmail"))).toBe(true);
+      }
+    }
+  });
+
+  it("rejects a missing or invalid contact number", () => {
+    for (const studentPhone of ["", "  ", "12345", "02001234567"]) {
+      const parsed = complaintSchema.safeParse({ ...base, studentPhone });
+      expect(parsed.success).toBe(false);
+      if (!parsed.success) {
+        expect(parsed.error.issues.some((issue) => issue.path.includes("studentPhone"))).toBe(true);
       }
     }
   });

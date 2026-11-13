@@ -29,7 +29,7 @@ export const complaintSchema = z
     facultyId: z.string().trim().min(1, "Choose a faculty.").max(80),
     departmentId: z.string().trim().min(1, "Choose a department.").max(80),
     programme: z.string().trim().min(2, "Enter your programme.").max(160),
-    semester: z.enum(SEMESTERS),
+    semester: z.enum(SEMESTERS, { errorMap: () => ({ message: "Choose your semester." }) }),
     subject: z.string().trim().min(8, "The subject needs at least 8 characters.").max(180),
     description: z.string().trim().min(30, "Describe what happened in at least a few sentences.").max(8000),
     desiredOutcome: optionalText(2000),
@@ -68,6 +68,23 @@ export const complaintSchema = z
         message: "Enter your full name. Your name is required for verification and will remain strictly confidential.",
       });
     }
+    if (value.programme.trim().length < 2) {
+      ctx.addIssue({ code: "custom", path: ["programme"], message: "Enter your programme." });
+    }
+    if (!isEmailAddress(value.studentEmail.trim().toLowerCase())) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["studentEmail"],
+        message: "Enter a valid email address. Your contact details will remain strictly confidential.",
+      });
+    }
+    if (!isPakistanMobile(value.studentPhone)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["studentPhone"],
+        message: "Enter a Pakistani mobile number, for example 03001234567. Your contact details will remain strictly confidential.",
+      });
+    }
     if (value.category === "harassment") {
       if (value.harassmentType !== "sexual" && value.harassmentType !== "other") {
         ctx.addIssue({
@@ -83,38 +100,9 @@ export const complaintSchema = z
           message: "Enter a valid registration or roll number.",
         });
       }
-      if (!isEmailAddress(value.studentEmail.trim().toLowerCase())) {
-        ctx.addIssue({ code: "custom", path: ["studentEmail"], message: "Enter a valid email address." });
-      }
-      if (!isPakistanMobile(value.studentPhone)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["studentPhone"],
-          message: "Enter a Pakistani mobile number, for example 03001234567.",
-        });
-      }
       return;
     }
-    const email = value.studentEmail.trim();
-    const phone = value.studentPhone.trim();
     const registration = value.registrationNumber.trim();
-    if (!email && !phone && !registration) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["studentEmail"],
-        message: "Add an email, a mobile number, or a registration number so the university can reach you.",
-      });
-    }
-    if (email && !isEmailAddress(email.toLowerCase())) {
-      ctx.addIssue({ code: "custom", path: ["studentEmail"], message: "Enter a valid email address." });
-    }
-    if (phone && !isPakistanMobile(phone)) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["studentPhone"],
-        message: "Enter a Pakistani mobile number, or leave the phone field empty.",
-      });
-    }
     if (registration && !isRegistrationNumber(registration)) {
       ctx.addIssue({
         code: "custom",

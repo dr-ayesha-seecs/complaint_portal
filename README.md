@@ -10,7 +10,7 @@ This repository does not deploy the portal. Set the environment variables below 
 
 - File a complaint about teaching, grading, exams, admission, administration, fees, scholarships, other finance matters, bribery, hostels, transport, the library, laboratories, IT, facilities, discrimination, bullying or ragging, harassment (including sexual harassment), safety, disability and access, or something else.
 - Attach up to **2 files**, each up to **1 MB**: PDF, PNG, JPEG, WEBP, or DOCX.
-- Give a **full name** on every complaint. The name is required for verification and remains strictly confidential. For ordinary complaints, also give an email, a mobile number, or a registration number so the university can reach you. Harassment requires a full name, registration or roll number, department, programme, email, and Pakistani mobile number. The browser and the server both reject anonymous or unnamed submissions.
+- Give a **full name**, **programme**, **semester**, **email**, and **Pakistani mobile number** on every complaint. These details are required for verification and remain strictly confidential. Harassment also requires a registration or roll number. The browser and the server both reject anonymous or incomplete submissions.
 - Receive a tracking number immediately, and an acknowledgement email when they give an address.
 - Track the case with the tracking number plus a secret key. No student account is required.
 - Appeal an outcome inside the time limit, or withdraw. A harassment withdrawal is recorded as a request, because the university may still have to inquire.

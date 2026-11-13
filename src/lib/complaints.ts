@@ -22,7 +22,7 @@ import {
   type SlaProfile,
 } from "./sla";
 import { categoryLabel, OPEN_STATUSES, statusLabel, STATUSES, type Status } from "./categories";
-import { complaintSchema, fieldErrorsFromZod, isEmailAddress, normalizePhone } from "./validation";
+import { complaintSchema, fieldErrorsFromZod, isEmailAddress, isPakistanMobile, normalizePhone } from "./validation";
 import { verifyTurnstile } from "./turnstile";
 import type { ComplaintFilters, PublicEvent, StudentView } from "./view-types";
 
@@ -162,6 +162,26 @@ export async function submitComplaint(
   if (input.studentName.trim().length < 3) {
     throw new HttpError(400, "Please correct the highlighted fields.", {
       studentName: ["Enter your full name. Your name is required for verification and will remain strictly confidential."],
+    });
+  }
+  if (input.programme.trim().length < 2) {
+    throw new HttpError(400, "Please correct the highlighted fields.", {
+      programme: ["Enter your programme."],
+    });
+  }
+  if (!input.semester) {
+    throw new HttpError(400, "Please correct the highlighted fields.", {
+      semester: ["Choose your semester."],
+    });
+  }
+  if (!isEmailAddress(input.studentEmail.trim().toLowerCase())) {
+    throw new HttpError(400, "Please correct the highlighted fields.", {
+      studentEmail: ["Enter a valid email address. Your contact details will remain strictly confidential."],
+    });
+  }
+  if (!isPakistanMobile(input.studentPhone)) {
+    throw new HttpError(400, "Please correct the highlighted fields.", {
+      studentPhone: ["Enter a Pakistani mobile number, for example 03001234567. Your contact details will remain strictly confidential."],
     });
   }
 

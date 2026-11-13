@@ -221,9 +221,9 @@ export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteK
       <fieldset>
         <legend>About you</legend>
         {harassment ? (
-          <p className="banner warn">Harassment complaints require your name, registration number, email, and mobile number. Your name will remain strictly confidential.</p>
+          <p className="banner warn">Harassment complaints require your name, programme, semester, registration number, email, and mobile number. Your name and contact details will remain strictly confidential.</p>
         ) : (
-          <p className="banner info">Your name is required for verification and will remain strictly confidential.</p>
+          <p className="banner info">Your name, programme, semester, email, and mobile number are required for verification and will remain strictly confidential.</p>
         )}
         {fieldMessage(fields, "anonymous")}
         <div className="fields">
@@ -233,11 +233,35 @@ export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteK
             fields={fields}
             autoComplete="name"
             required
-            hint="Your name is required for verification and will remain strictly confidential."
+            hint="Your name and contact details are required for verification and will remain strictly confidential."
           />
+          <div className="grid-2">
+            <div className="field">
+              <label htmlFor="programme">Programme (required)</label>
+              <input id="programme" name="programme" list="programmes" required maxLength={160} aria-invalid={fields.programme?.length ? true : undefined} />
+              <datalist id="programmes">
+                {PROGRAMME_SUGGESTIONS.map((item) => (
+                  <option key={item} value={item} />
+                ))}
+              </datalist>
+              {fieldMessage(fields, "programme")}
+            </div>
+            <div className="field">
+              <label htmlFor="semester">Semester (required)</label>
+              <select id="semester" name="semester" defaultValue="" required aria-invalid={fields.semester?.length ? true : undefined}>
+                <option value="">Choose your semester</option>
+                {SEMESTERS.map((item) => (
+                  <option key={item} value={item}>
+                    {semesterLabel(item)}
+                  </option>
+                ))}
+              </select>
+              {fieldMessage(fields, "semester")}
+            </div>
+          </div>
+          <TextField id="studentEmail" label="Email (required)" type="email" fields={fields} autoComplete="email" required />
+          <TextField id="studentPhone" label="Mobile number (required)" fields={fields} autoComplete="tel" required hint="Pakistani mobile, for example 03001234567." />
           <TextField id="registrationNumber" label={harassment ? "Registration / roll number (required)" : "Registration / roll number"} fields={fields} required={harassment} />
-          <TextField id="studentEmail" label={harassment ? "Email (required)" : "Email"} type="email" fields={fields} autoComplete="email" required={harassment} />
-          <TextField id="studentPhone" label={harassment ? "Mobile number (required)" : "Mobile number"} fields={fields} autoComplete="tel" required={harassment} hint="Pakistani mobile, for example 03001234567. For other complaints, give an email, a mobile number, or a registration number." />
         </div>
       </fieldset>
 
@@ -269,28 +293,6 @@ export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteK
               ))}
             </select>
             {fieldMessage(fields, "departmentId")}
-          </div>
-        </div>
-        <div className="grid-2" style={{ marginTop: "0.8rem" }}>
-          <div className="field">
-            <label htmlFor="programme">Programme (required)</label>
-            <input id="programme" name="programme" list="programmes" required maxLength={160} />
-            <datalist id="programmes">
-              {PROGRAMME_SUGGESTIONS.map((item) => (
-                <option key={item} value={item} />
-              ))}
-            </datalist>
-            {fieldMessage(fields, "programme")}
-          </div>
-          <div className="field">
-            <label htmlFor="semester">Semester (required)</label>
-            <select id="semester" name="semester" defaultValue="1" required>
-              {SEMESTERS.map((item) => (
-                <option key={item} value={item}>
-                  {semesterLabel(item)}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
         <label className="check">

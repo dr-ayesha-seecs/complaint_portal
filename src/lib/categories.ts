@@ -44,13 +44,17 @@ export const CATEGORY_HINTS: Partial<Record<CategoryId, string>> = {
   academic_exams: "Include the course code, exam date, and result notification if you have them.",
 };
 
-export const SEMESTERS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "summer", "not_applicable"] as const;
+export const SEMESTERS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "summer", "ms", "phd", "not_applicable"] as const;
 export type Semester = (typeof SEMESTERS)[number];
 
 export function semesterLabel(value: string): string {
   if (value === "summer") return "Summer";
-  if (value === "not_applicable") return "Not applicable";
-  return `Semester ${value}`;
+  if (value === "ms") return "MS / MPhil";
+  if (value === "phd") return "PhD";
+  if (value === "not_applicable") return "Other";
+  const suffixes: Record<string, string> = { "1": "1st", "2": "2nd", "3": "3rd" };
+  if (/^\d+$/.test(value)) return `${suffixes[value] ?? `${value}th`} Semester`;
+  return value;
 }
 
 export const PROGRAMME_SUGGESTIONS = [

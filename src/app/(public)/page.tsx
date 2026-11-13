@@ -37,7 +37,7 @@ export default function HomePage() {
             <li>Harassment files referred onward within {SLA.harassment.referralHours} hours, with an inquiry target of {SLA.harassment.inquiryCalendarDays} days.</li>
             <li>A right to appeal, and a clear rule against retaliation.</li>
           </ul>
-          <p className="hint">Your name is required on every complaint for verification and will remain strictly confidential. Only the officers who need to act on the file can see it.</p>
+          <p className="hint">Your name, programme, semester, email, and mobile number are required on every complaint for verification and will remain strictly confidential. Only the officers who need to act on the file can see them.</p>
         </aside>
       </section>
 

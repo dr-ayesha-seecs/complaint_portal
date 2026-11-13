@@ -20,7 +20,7 @@ export default function PrivacyPage() {
         <h2>What we collect</h2>
         <ul>
           <li>The complaint itself: category, faculty, department, programme, semester, description, the outcome you want, and any files you attach.</li>
-          <li>Your name, which is required for verification on every complaint and remains strictly confidential, together with any contact or registration details you give.</li>
+          <li>Your name, programme, semester, email, and mobile number, which are required for verification on every complaint and remain strictly confidential, together with any registration details you give.</li>
           <li>For harassment: your full name, registration or roll number, department, programme, email, and mobile number. These are required. The form will not accept a harassment complaint without them.</li>
           <li>A secret tracking key, stored only as a one-way hash. Staff cannot read the original key. A member of staff can issue a new key after confirming your identity.</li>
           <li>A hash of the network address used to submit or track a complaint, for abuse prevention. The raw address is not stored on the complaint.</li>
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
 
         <h2>Your choices</h2>
         <ul>
-          <li>Anonymous complaints are not accepted. Your name is required for verification and will remain strictly confidential. You will need the tracking key to see the status. If you lose the key, a member of staff can issue a new one after confirming your identity.</li>
+          <li>Anonymous complaints are not accepted. Your name, programme, semester, email, and mobile number are required for verification and will remain strictly confidential. You will need the tracking key to see the status. If you lose the key, a member of staff can issue a new one after confirming your identity.</li>
           <li>You may withdraw an ordinary complaint. A harassment complaint may still be examined after a withdrawal request.</li>
           <li>You may ask the Registrar to correct a factual mistake in your contact details.</li>
           <li>Read the <Link href="/procedure">procedure</Link> for response times, appeals, and the rule against retaliation.</li>
