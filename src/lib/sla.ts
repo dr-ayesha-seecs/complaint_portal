@@ -11,12 +11,11 @@ import { isCommitteeCategory } from "./policy";
  *
  * Bullying, discrimination and harassment files follow the investigation
  * timetable in the Anti-Discrimination-Anti-Harassment complaint procedure
- * adopted for use with the Committee of Anti-Bullying and Harassment
- * Monitoring (Registrar notification No. MNS-UAM/PO/75/1800 dated
- * 02 October 2023): a prompt, thorough and impartial investigation, to be
- * completed within 45 days where possible, with notice to the complainant
- * if that period has to be extended; the relevant head of department
- * confirms remedial action to the dean or director within 14 days.
+ * used by the Committee of Anti-Bullying and Harassment Monitoring: a
+ * prompt, thorough and impartial investigation, to be completed within
+ * 45 days where possible, with notice to the complainant if that period
+ * has to be extended; the relevant head of department confirms remedial
+ * action to the dean or director within 14 days.
  *
  * Working days are Monday to Friday in Asia/Karachi. The university can record an
  * extension, but the portal flags the file as overdue once `dueAt` has passed.

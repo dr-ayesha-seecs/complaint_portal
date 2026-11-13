@@ -2,11 +2,6 @@
 
 export const COMMITTEE_NAME = "Committee of Anti-Bullying and Harassment Monitoring";
 
-/** Registrar Office notification constituting the committee. */
-export const COMMITTEE_NOTIFICATION_NO = "MNS-UAM/PO/75/1800";
-export const COMMITTEE_NOTIFICATION_DATE = "02 October 2023";
-export const COMMITTEE_EC_MEETING = "39th/2023 meeting of the Executive Committee, held on 26 September 2023";
-
 export const COMMITTEE_MEMBERS = [
   {
     name: "Dr. Ayesha Hakim, Assistant Professor, Institute of Computing",

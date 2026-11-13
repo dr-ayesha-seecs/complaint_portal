@@ -1,12 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  COMMITTEE_EC_MEETING,
-  COMMITTEE_MEMBERS,
-  COMMITTEE_NAME,
-  COMMITTEE_NOTIFICATION_DATE,
-  COMMITTEE_NOTIFICATION_NO,
-} from "@/lib/policy";
+import { COMMITTEE_MEMBERS, COMMITTEE_NAME } from "@/lib/policy";
 import { SLA } from "@/lib/sla";
 
 export const metadata: Metadata = { title: "Complaint procedure" };
@@ -20,7 +14,7 @@ export default function ProcedurePage() {
           This is the Students Complaints Portal of Muhammad Nawaz Shareef University of Agriculture, Multan. It is the university&apos;s recorded way for a student to file a complaint, receive a tracking number, and follow the status of the file.
         </p>
         <p>
-          Complaints of bullying, discrimination or harassment are handled through the {COMMITTEE_NAME}, constituted by Registrar notification No. {COMMITTEE_NOTIFICATION_NO} dated {COMMITTEE_NOTIFICATION_DATE}. The Vice Chancellor accorded approval to constitute the committee on the recommendations of the {COMMITTEE_EC_MEETING}. That notification charges the committee with ensuring strict implementation of the university&apos;s Anti-Bullying and Harassment Policy on campus, arranging guidance sessions, explaining the reporting process, and submitting a report to the proper forum for further inquiry and action.
+          Complaints of bullying, discrimination or harassment are handled through the {COMMITTEE_NAME}. The committee ensures strict implementation of the university&apos;s Anti-Bullying and Harassment Policy on campus, arranges guidance sessions, explains the reporting process, and submits a report to the proper forum for further inquiry and action.
         </p>
         <p>The service is free. You do not need an account. You may complain as one student. A group should nominate one person to file and share the tracking key with the others through a safe channel.</p>
 
@@ -47,7 +41,7 @@ export default function ProcedurePage() {
           The file is sent to the departmental chairperson and the dean, unless you say the head of department is involved, and to the {COMMITTEE_NAME} when those addresses have been configured. Directors, deans and heads of department are required to enforce the Anti-Bullying and Harassment Policy, not to take part in bullying, discrimination or harassment, and to report promptly any such conduct they observe, learn about, or reasonably suspect. A staff member who knowingly allows such conduct to continue is subject to discipline. The university may look into conduct that violates the policy even if no formal complaint is later pursued.
         </p>
         <h3>The official committee</h3>
-        <p>As constituted by notification No. {COMMITTEE_NOTIFICATION_NO} dated {COMMITTEE_NOTIFICATION_DATE}, the committee is:</p>
+        <p>The committee is:</p>
         <ul>
           {COMMITTEE_MEMBERS.map((member) => (
             <li key={member.name}>

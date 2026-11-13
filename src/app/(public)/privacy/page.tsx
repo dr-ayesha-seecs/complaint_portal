@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  COMMITTEE_NAME,
-  COMMITTEE_NOTIFICATION_DATE,
-  COMMITTEE_NOTIFICATION_NO,
-  REGISTRAR_ADDRESS,
-  REGISTRAR_EMAIL,
-  REGISTRAR_PHONE,
-} from "@/lib/policy";
+import { COMMITTEE_NAME, REGISTRAR_ADDRESS, REGISTRAR_EMAIL, REGISTRAR_PHONE } from "@/lib/policy";
 
 export const metadata: Metadata = { title: "Privacy notice" };
 
@@ -37,7 +30,7 @@ export default function PrivacyPage() {
 
         <h2>Why we use it</h2>
         <p>
-          To acknowledge, investigate, respond to, escalate, and review complaints, and to let the university carry out the Anti-Bullying and Harassment Policy through the {COMMITTEE_NAME} constituted by Registrar notification No. {COMMITTEE_NOTIFICATION_NO} dated {COMMITTEE_NOTIFICATION_DATE}. Staff audit logs exist so the university can see who opened or changed a confidential file.
+          To acknowledge, investigate, respond to, escalate, and review complaints, and to let the university carry out the Anti-Bullying and Harassment Policy through the {COMMITTEE_NAME}. Staff audit logs exist so the university can see who opened or changed a confidential file.
         </p>
 
         <h2>Who sees it</h2>
