@@ -15,7 +15,7 @@ const dbPath = path.join(process.cwd(), "data", "vitest.db");
 const base = {
   category: "academic_teaching" as const,
   harassmentType: "" as const,
-  anonymous: true,
+  anonymous: false,
   concernsDepartmentHead: false,
   facultyId: "foc",
   departmentId: "foc-aids",
@@ -27,9 +27,9 @@ const base = {
   incidentDate: "",
   location: "",
   respondentName: "",
-  studentName: "",
+  studentName: "Test Student",
   registrationNumber: "",
-  studentEmail: "",
+  studentEmail: "student@example.com",
   studentPhone: "",
   confirmTruth: true,
   confirmPrivacy: true,
@@ -76,12 +76,37 @@ describe("standards helpers", () => {
 });
 
 describe("complaint validation", () => {
-  it("allows an anonymous academic complaint", () => {
+  it("accepts a named academic complaint", () => {
     expect(complaintSchema.safeParse(base).success).toBe(true);
   });
 
+  it("rejects an anonymous academic complaint", () => {
+    const parsed = complaintSchema.safeParse({ ...base, anonymous: true });
+    expect(parsed.success).toBe(false);
+    if (!parsed.success) {
+      expect(parsed.error.issues.some((issue) => issue.path.includes("anonymous"))).toBe(true);
+    }
+  });
+
+  it("rejects a missing or whitespace-only student name", () => {
+    for (const studentName of ["", "  ", "\t"]) {
+      const parsed = complaintSchema.safeParse({ ...base, studentName });
+      expect(parsed.success).toBe(false);
+      if (!parsed.success) {
+        expect(parsed.error.issues.some((issue) => issue.path.includes("studentName"))).toBe(true);
+      }
+    }
+  });
+
   it("rejects an anonymous harassment complaint", () => {
-    const parsed = complaintSchema.safeParse({ ...base, category: "harassment", anonymous: true, harassmentType: "sexual" });
+    const parsed = complaintSchema.safeParse({
+      ...base,
+      category: "harassment",
+      anonymous: true,
+      harassmentType: "sexual",
+      registrationNumber: "2022-AI-014",
+      studentPhone: "03001234567",
+    });
     expect(parsed.success).toBe(false);
     if (!parsed.success) {
       expect(parsed.error.issues.some((issue) => issue.path.includes("anonymous"))).toBe(true);
@@ -95,6 +120,7 @@ describe("complaint validation", () => {
       anonymous: false,
       harassmentType: "sexual",
       studentName: "Test Student",
+      studentEmail: "student@example.com",
     });
     expect(parsed.success).toBe(false);
   });
@@ -217,7 +243,7 @@ describe("roles and assignments", () => {
 });
 
 describe("complaint flow", () => {
-  it("stores an anonymous complaint, rejects anonymous harassment, and enforces access", async () => {
+  it("stores a named complaint, rejects anonymous or unnamed submissions, and enforces access", async () => {
     const { submitComplaint, trackComplaint, getComplaintForUser } = await import("../src/lib/complaints");
     const { insertUser } = await import("../src/lib/auth");
     const { getClient } = await import("../src/lib/db");
@@ -227,7 +253,22 @@ describe("complaint flow", () => {
     expect(created.trackingNumber).toMatch(/^MNS-\d{4}-[A-Z2-9]{8}$/);
     const view = await trackComplaint(created.trackingNumber, created.secretKey, "127.0.0.1");
     expect(view.status).toBe("submitted");
+    expect(view.studentName).toBe("Test Student");
+    expect(view.anonymous).toBe(false);
+    const stored = await getClient().execute({
+      sql: "SELECT is_anonymous, student_name FROM complaints WHERE tracking_number = ?",
+      args: [created.trackingNumber],
+    });
+    expect(Number(stored.rows[0]?.is_anonymous)).toBe(0);
+    expect(String(stored.rows[0]?.student_name)).toBe("Test Student");
     await expect(trackComplaint(created.trackingNumber, "WRONG-KEY1-XXXX", "10.0.0.8")).rejects.toBeInstanceOf(HttpError);
+
+    await expect(
+      submitComplaint({ ...base, studentName: "   " }, [], { ip: "127.0.0.11", appUrl: "http://localhost:3000" }),
+    ).rejects.toMatchObject({ status: 400 });
+    await expect(
+      submitComplaint({ ...base, anonymous: true }, [], { ip: "127.0.0.12", appUrl: "http://localhost:3000" }),
+    ).rejects.toMatchObject({ status: 400 });
 
     await expect(
       submitComplaint(

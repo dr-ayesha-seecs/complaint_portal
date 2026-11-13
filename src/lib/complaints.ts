@@ -154,9 +154,14 @@ export async function submitComplaint(
   }
   const input = parsed.data;
   if (input.companyWebsite.trim()) throw new HttpError(400, "The complaint could not be submitted.");
-  if (input.category === "harassment" && input.anonymous) {
-    throw new HttpError(400, "Harassment complaints cannot be anonymous.", {
-      anonymous: ["Harassment complaints cannot be anonymous. Please give your full details."],
+  if (input.anonymous) {
+    throw new HttpError(400, "Anonymous complaints are not allowed.", {
+      anonymous: ["Anonymous complaints are not allowed. Please enter your name. Your name will remain strictly confidential."],
+    });
+  }
+  if (input.studentName.trim().length < 3) {
+    throw new HttpError(400, "Please correct the highlighted fields.", {
+      studentName: ["Enter your full name. Your name is required for verification and will remain strictly confidential."],
     });
   }
 
@@ -174,15 +179,13 @@ export async function submitComplaint(
   const trackingNumber = await uniqueTracking(now);
   const secretKey = generateSecret();
   const id = randomUUID();
-  const anonymous = input.category === "harassment" ? false : input.anonymous;
-  const identity = anonymous
-    ? { name: null, registration: null, email: null, phone: null }
-    : {
-        name: blankToNull(input.studentName),
-        registration: blankToNull(input.registrationNumber)?.toUpperCase() ?? null,
-        email: blankToNull(input.studentEmail)?.toLowerCase() ?? null,
-        phone: input.studentPhone?.trim() ? normalizePhone(input.studentPhone) : null,
-      };
+  const anonymous = false;
+  const identity = {
+    name: blankToNull(input.studentName),
+    registration: blankToNull(input.registrationNumber)?.toUpperCase() ?? null,
+    email: blankToNull(input.studentEmail)?.toLowerCase() ?? null,
+    phone: input.studentPhone?.trim() ? normalizePhone(input.studentPhone) : null,
+  };
   const concerns = Boolean(input.concernsDepartmentHead);
   const status: Status = concerns ? "escalated" : "submitted";
   const createdAt = now.toISOString();

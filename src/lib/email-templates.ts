@@ -69,7 +69,7 @@ export function staffEmail(input: {
       `Faculty: ${input.facultyName}`,
       `Department: ${input.departmentName}`,
       `Subject: ${input.subject}`,
-      `Filed: ${input.anonymous ? "without the student's name" : "with contact details on the file"}`,
+      `Filed: ${input.anonymous ? "without the student's name (historical file)" : "with the student's name on the file — keep confidential"}`,
       `Response due: ${formatDateTime(input.dueAt)} (Pakistan time)`,
       input.concernsDepartmentHead
         ? "The student indicated that the head of department is involved, so the chairperson was not copied."

@@ -37,7 +37,7 @@ export default function HomePage() {
             <li>Harassment files referred onward within {SLA.harassment.referralHours} hours, with an inquiry target of {SLA.harassment.inquiryCalendarDays} days.</li>
             <li>A right to appeal, and a clear rule against retaliation.</li>
           </ul>
-          <p className="hint">Anonymous complaints are allowed, except for harassment. Harassment needs your name and contact details so it can be investigated properly.</p>
+          <p className="hint">Your name is required on every complaint for verification and will remain strictly confidential. Only the officers who need to act on the file can see it.</p>
         </aside>
       </section>
 
@@ -68,7 +68,7 @@ export default function HomePage() {
         </article>
         <article className="card">
           <h3>You stay in control</h3>
-          <p>Track the status with your tracking number and secret key. You can appeal an outcome, or withdraw a complaint. Keep the key. Anonymous keys cannot be reissued.</p>
+          <p>Track the status with your tracking number and secret key. You can appeal an outcome, or withdraw a complaint. Keep the key. A member of staff can issue a new one after confirming your identity.</p>
         </article>
       </section>
     </div>

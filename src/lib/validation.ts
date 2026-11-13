@@ -24,7 +24,7 @@ export const complaintSchema = z
   .object({
     category: z.enum(CATEGORY_IDS),
     harassmentType: z.enum(["sexual", "other"]).optional().or(z.literal("")).default(""),
-    anonymous: z.boolean(),
+    anonymous: z.boolean().optional().default(false),
     concernsDepartmentHead: z.boolean().default(false),
     facultyId: z.string().trim().min(1, "Choose a faculty.").max(80),
     departmentId: z.string().trim().min(1, "Choose a department.").max(80),
@@ -54,23 +54,27 @@ export const complaintSchema = z
     } else if (value.incidentDate && value.incidentDate > todayKarachi()) {
       ctx.addIssue({ code: "custom", path: ["incidentDate"], message: "The incident date cannot be in the future." });
     }
+    if (value.anonymous) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["anonymous"],
+        message: "Anonymous complaints are not allowed. Please enter your name. Your name will remain strictly confidential.",
+      });
+    }
+    if (value.studentName.trim().length < 3) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["studentName"],
+        message: "Enter your full name. Your name is required for verification and will remain strictly confidential.",
+      });
+    }
     if (value.category === "harassment") {
-      if (value.anonymous) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["anonymous"],
-          message: "Harassment complaints cannot be anonymous. Please give your full details.",
-        });
-      }
       if (value.harassmentType !== "sexual" && value.harassmentType !== "other") {
         ctx.addIssue({
           code: "custom",
           path: ["harassmentType"],
           message: "Say whether this is sexual harassment or another form of harassment.",
         });
-      }
-      if (value.studentName.trim().length < 3) {
-        ctx.addIssue({ code: "custom", path: ["studentName"], message: "Enter your full name." });
       }
       if (!isRegistrationNumber(value.registrationNumber.trim())) {
         ctx.addIssue({
@@ -91,37 +95,32 @@ export const complaintSchema = z
       }
       return;
     }
-    if (!value.anonymous) {
-      if (value.studentName.trim().length < 3) {
-        ctx.addIssue({ code: "custom", path: ["studentName"], message: "Enter your name, or submit anonymously." });
-      }
-      const email = value.studentEmail.trim();
-      const phone = value.studentPhone.trim();
-      const registration = value.registrationNumber.trim();
-      if (!email && !phone && !registration) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["studentEmail"],
-          message: "Add an email, a mobile number, or a registration number so the university can reach you.",
-        });
-      }
-      if (email && !isEmailAddress(email.toLowerCase())) {
-        ctx.addIssue({ code: "custom", path: ["studentEmail"], message: "Enter a valid email address." });
-      }
-      if (phone && !isPakistanMobile(phone)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["studentPhone"],
-          message: "Enter a Pakistani mobile number, or leave the phone field empty.",
-        });
-      }
-      if (registration && !isRegistrationNumber(registration)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["registrationNumber"],
-          message: "Registration numbers use letters, numbers, and dashes only.",
-        });
-      }
+    const email = value.studentEmail.trim();
+    const phone = value.studentPhone.trim();
+    const registration = value.registrationNumber.trim();
+    if (!email && !phone && !registration) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["studentEmail"],
+        message: "Add an email, a mobile number, or a registration number so the university can reach you.",
+      });
+    }
+    if (email && !isEmailAddress(email.toLowerCase())) {
+      ctx.addIssue({ code: "custom", path: ["studentEmail"], message: "Enter a valid email address." });
+    }
+    if (phone && !isPakistanMobile(phone)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["studentPhone"],
+        message: "Enter a Pakistani mobile number, or leave the phone field empty.",
+      });
+    }
+    if (registration && !isRegistrationNumber(registration)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["registrationNumber"],
+        message: "Registration numbers use letters, numbers, and dashes only.",
+      });
     }
   });
 

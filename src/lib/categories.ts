@@ -30,16 +30,16 @@ export function categoryLabel(id: string): string {
 }
 export const CATEGORY_HINTS: Partial<Record<CategoryId, string>> = {
   harassment:
-    "Harassment complaints cannot be anonymous. Your full name, registration number, department, programme, email, and mobile number are required. The file is confidential. Retaliation for reporting is prohibited.",
+    "Your full name, registration number, department, programme, email, and mobile number are required. Your name will remain strictly confidential. Retaliation for reporting is prohibited.",
   bullying_ragging:
-    "You may file this without your name. If someone is in immediate danger, contact campus security or the police before using this portal.",
+    "Your name is required for verification and will remain strictly confidential. If someone is in immediate danger, contact campus security or the police before using this portal.",
   safety_security:
     "If you or someone else is in immediate danger, contact campus security or the police first. This portal is not an emergency service.",
   disability_access:
     "You can address this to Disability and Accessibility Coordination under University Administration, or to your own department. It may be escalated to the Vice Chancellor.",
   fee: "If you have a challan, bank receipt, or fee notice, attach a copy.",
   scholarship: "Name the scholarship and the semester in your description.",
-  bribery: "Include dates, amounts, and who asked, as far as you know. You may file this without your name.",
+  bribery: "Include dates, amounts, and who asked, as far as you know. Your name is required for verification and will remain strictly confidential.",
   academic_grading: "Give the course, the assessment, and what you believe should be reviewed. This is not a re-marking shortcut; it opens a recorded process.",
   academic_exams: "Include the course code, exam date, and result notification if you have them.",
 };

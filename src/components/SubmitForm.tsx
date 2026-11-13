@@ -13,7 +13,6 @@ type Success = { trackingNumber: string; secretKey: string; dueAt: string; email
 export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteKey: string }) {
   const searchParams = useSearchParams();
   const [category, setCategory] = useState("");
-  const [anonymous, setAnonymous] = useState(true);
   const [facultyId, setFacultyId] = useState(org[0]?.id ?? "");
   const [departmentId, setDepartmentId] = useState(org[0]?.departments[0]?.id ?? "");
   const [error, setError] = useState("");
@@ -39,7 +38,6 @@ export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteK
     const raw = searchParams.get("category") || "";
     const next = CATEGORY_IDS.includes(raw as CategoryId) ? raw : "";
     setCategory(next);
-    setAnonymous(next !== "harassment");
   }, [searchParams]);
 
   useEffect(() => {
@@ -60,7 +58,6 @@ export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteK
 
   function onCategory(next: string) {
     setCategory(next);
-    if (next === "harassment") setAnonymous(false);
   }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -71,7 +68,7 @@ export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteK
     const payload = {
       category,
       harassmentType: harassment ? String(form.get("harassmentType") || "") : "",
-      anonymous: harassment ? false : anonymous,
+      anonymous: false,
       concernsDepartmentHead: form.get("concernsDepartmentHead") === "on",
       facultyId,
       departmentId,
@@ -151,7 +148,7 @@ export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteK
             : "No email was requested, or the address was left blank. The key exists only in this message."}
         </p>
         <p>Target response date: {new Date(success.dueAt).toLocaleString("en-PK", { timeZone: "Asia/Karachi" })} (Pakistan time).</p>
-        <p className="banner warn">If you filed anonymously, this key cannot be reissued. Store it somewhere you can find it.</p>
+        <p className="hint">Keep this key. A member of staff can issue a new one after confirming your identity.</p>
         <p>
           <Link className="btn" href="/track">
             Track this complaint
@@ -164,7 +161,7 @@ export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteK
   const groups = [...new Set(CATEGORIES.map((item) => item.group))];
 
   return (
-    <form className="panel" onSubmit={onSubmit} noValidate>
+    <form className="panel" onSubmit={onSubmit} noValidate method="post" action="/submit">
       <h1>File a complaint</h1>
       <p>Fields marked required must be completed.</p>
       {error ? (
@@ -224,24 +221,24 @@ export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteK
       <fieldset>
         <legend>About you</legend>
         {harassment ? (
-          <p className="banner warn">Harassment complaints cannot be anonymous. Your name, registration number, email, and mobile number are required.</p>
+          <p className="banner warn">Harassment complaints require your name, registration number, email, and mobile number. Your name will remain strictly confidential.</p>
         ) : (
-          <label className="check">
-            <input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} />
-            <span>Submit without my name. I understand I must keep the secret key, and that it cannot be reissued.</span>
-          </label>
+          <p className="banner info">Your name is required for verification and will remain strictly confidential.</p>
         )}
         {fieldMessage(fields, "anonymous")}
-        {!anonymous || harassment ? (
-          <div className="fields">
-            <TextField id="studentName" label={harassment ? "Full name (required)" : "Full name"} fields={fields} autoComplete="name" />
-            <TextField id="registrationNumber" label={harassment ? "Registration / roll number (required)" : "Registration / roll number"} fields={fields} />
-            <TextField id="studentEmail" label={harassment ? "Email (required)" : "Email"} type="email" fields={fields} autoComplete="email" />
-            <TextField id="studentPhone" label={harassment ? "Mobile number (required)" : "Mobile number"} fields={fields} autoComplete="tel" hint="Pakistani mobile, for example 03001234567." />
-          </div>
-        ) : (
-          <p className="hint">Leave your name off the file. You will still choose a department so the complaint reaches the right office.</p>
-        )}
+        <div className="fields">
+          <TextField
+            id="studentName"
+            label="Full name (required)"
+            fields={fields}
+            autoComplete="name"
+            required
+            hint="Your name is required for verification and will remain strictly confidential."
+          />
+          <TextField id="registrationNumber" label={harassment ? "Registration / roll number (required)" : "Registration / roll number"} fields={fields} required={harassment} />
+          <TextField id="studentEmail" label={harassment ? "Email (required)" : "Email"} type="email" fields={fields} autoComplete="email" required={harassment} />
+          <TextField id="studentPhone" label={harassment ? "Mobile number (required)" : "Mobile number"} fields={fields} autoComplete="tel" required={harassment} hint="Pakistani mobile, for example 03001234567. For other complaints, give an email, a mobile number, or a registration number." />
+        </div>
       </fieldset>
 
       <fieldset>
@@ -366,6 +363,7 @@ function TextField({
   hint,
   autoComplete,
   maxLength,
+  required,
 }: {
   id: string;
   label: string;
@@ -374,11 +372,12 @@ function TextField({
   hint?: string;
   autoComplete?: string;
   maxLength?: number;
+  required?: boolean;
 }) {
   return (
     <div className="field">
       <label htmlFor={id}>{label}</label>
-      <input id={id} name={id} type={type} autoComplete={autoComplete} maxLength={maxLength} aria-invalid={fields[id]?.length ? true : undefined} />
+      <input id={id} name={id} type={type} autoComplete={autoComplete} maxLength={maxLength} required={required} aria-required={required || undefined} aria-invalid={fields[id]?.length ? true : undefined} />
       {hint ? <span className="hint">{hint}</span> : null}
       {fieldMessage(fields, id)}
     </div>

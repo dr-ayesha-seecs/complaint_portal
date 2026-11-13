@@ -71,7 +71,7 @@ export function TrackPanel() {
   return (
     <div className="panel">
       <h1>Track a complaint</h1>
-      <p>Enter the tracking number and the secret key from your acknowledgement. Staff cannot look the key up for an anonymous complaint.</p>
+      <p>Enter the tracking number and the secret key from your acknowledgement. If you lose the key, a member of staff can issue a new one after confirming your identity.</p>
       <form onSubmit={lookup} className="fields">
         {error ? (
           <div className="error-summary" role="alert">

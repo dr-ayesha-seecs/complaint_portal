@@ -16,7 +16,7 @@ export default function ProcedurePage() {
 
         <h2>1. Filing and acknowledgement</h2>
         <p>
-          You choose a category, your faculty and department, your programme and semester, and describe what happened and what you want done. You may attach up to two files (PDF, PNG, JPEG, WEBP, or DOCX, 1 MB each). The portal issues a tracking number immediately. That is the reference you should quote. If you give an email address, the same acknowledgement is sent there, together with a secret key.
+          You choose a category, your faculty and department, your programme and semester, and describe what happened and what you want done. Your name is required for verification and will remain strictly confidential. You may attach up to two files (PDF, PNG, JPEG, WEBP, or DOCX, 1 MB each). The portal issues a tracking number immediately. That is the reference you should quote. If you give an email address, the same acknowledgement is sent there, together with a secret key.
         </p>
 
         <h2>2. Ordinary complaints</h2>
@@ -30,7 +30,7 @@ export default function ProcedurePage() {
         </ul>
 
         <h2>3. Harassment, including sexual harassment</h2>
-        <p>You cannot file a harassment complaint anonymously. The portal asks for your full name, registration or roll number, department, programme, email, and mobile number. That rule is enforced in the browser and again on the server.</p>
+        <p>Harassment complaints require your full name, registration or roll number, department, programme, email, and mobile number. Your name is required for verification and will remain strictly confidential. That rule is enforced in the browser and again on the server.</p>
         <ul>
           <li>The complaint is confidential. Staff are told not to forward the notice.</li>
           <li>It is sent to the departmental chairperson and the dean, unless you say the head of department is involved.</li>
@@ -45,7 +45,7 @@ export default function ProcedurePage() {
 
         <h2>4. Other sensitive complaints</h2>
         <p>
-          Discrimination, ragging, bullying, bribery, safety, and disability or access complaints can be anonymous. Disability complaints may be addressed to Disability and Accessibility Coordination under University Administration, or to your department, and can be escalated to the Vice Chancellor. This matches the direction of the HEC Policy for Students with Disabilities.
+          Discrimination, ragging, bullying, bribery, safety, and disability or access complaints also require your name, which remains strictly confidential. Disability complaints may be addressed to Disability and Accessibility Coordination under University Administration, or to your department, and can be escalated to the Vice Chancellor. This matches the direction of the HEC Policy for Students with Disabilities.
         </p>
         <p>Ragging is treated as a conduct complaint. If someone is in danger now, contact campus security or the police before using this form.</p>
 
