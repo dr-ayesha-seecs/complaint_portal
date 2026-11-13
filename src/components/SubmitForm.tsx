@@ -1,0 +1,420 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { CATEGORIES, CATEGORY_IDS, CATEGORY_HINTS, PROGRAMME_SUGGESTIONS, SEMESTERS, semesterLabel, type CategoryId } from "@/lib/categories";
+import { complaintSchema } from "@/lib/validation";
+
+type Org = { id: string; name: string; departments: { id: string; name: string }[] }[];
+
+type Success = { trackingNumber: string; secretKey: string; dueAt: string; emailed: boolean };
+
+export function SubmitForm({ org, turnstileSiteKey }: { org: Org; turnstileSiteKey: string }) {
+  const searchParams = useSearchParams();
+  const [category, setCategory] = useState("");
+  const [facultyId, setFacultyId] = useState(org[0]?.id ?? "");
+  const [departmentId, setDepartmentId] = useState(org[0]?.departments[0]?.id ?? "");
+  const [error, setError] = useState("");
+  const [fields, setFields] = useState<Record<string, string[]>>({});
+  const [pending, setPending] = useState(false);
+  const [success, setSuccess] = useState<Success | null>(null);
+  const [companyWebsite, setCompanyWebsite] = useState("");
+  const summaryRef = useRef<HTMLDivElement>(null);
+  const harassment = category === "harassment";
+
+  useEffect(() => {
+    if (!turnstileSiteKey) return;
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      script.remove();
+    };
+  }, [turnstileSiteKey]);
+
+  useEffect(() => {
+    const raw = searchParams.get("category") || "";
+    const next = CATEGORY_IDS.includes(raw as CategoryId) ? raw : "";
+    setCategory(next);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!error) return;
+    const node = summaryRef.current;
+    if (!node) return;
+    node.scrollIntoView({ behavior: "smooth", block: "center" });
+    node.focus();
+  }, [error, fields]);
+
+  const departments = useMemo(() => org.find((item) => item.id === facultyId)?.departments ?? [], [org, facultyId]);
+
+  useEffect(() => {
+    if (!departments.some((item) => item.id === departmentId)) {
+      setDepartmentId(departments[0]?.id ?? "");
+    }
+  }, [departments, departmentId]);
+
+  function onCategory(next: string) {
+    setCategory(next);
+  }
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setFields({});
+    const form = new FormData(event.currentTarget);
+    const payload = {
+      category,
+      harassmentType: harassment ? String(form.get("harassmentType") || "") : "",
+      anonymous: false,
+      concernsDepartmentHead: form.get("concernsDepartmentHead") === "on",
+      facultyId,
+      departmentId,
+      programme: String(form.get("programme") || ""),
+      semester: String(form.get("semester") || ""),
+      subject: String(form.get("subject") || ""),
+      description: String(form.get("description") || ""),
+      desiredOutcome: String(form.get("desiredOutcome") || ""),
+      incidentDate: String(form.get("incidentDate") || ""),
+      location: String(form.get("location") || ""),
+      respondentName: String(form.get("respondentName") || ""),
+      studentName: String(form.get("studentName") || ""),
+      registrationNumber: String(form.get("registrationNumber") || ""),
+      studentEmail: String(form.get("studentEmail") || ""),
+      studentPhone: String(form.get("studentPhone") || ""),
+      confirmTruth: form.get("confirmTruth") === "on",
+      confirmPrivacy: form.get("confirmPrivacy") === "on",
+      confirmNonRetaliation: form.get("confirmNonRetaliation") === "on",
+      companyWebsite,
+    };
+    const parsed = complaintSchema.safeParse(payload);
+    if (!parsed.success) {
+      const next: Record<string, string[]> = {};
+      for (const issue of parsed.error.issues) {
+        const key = String(issue.path[0] || "form");
+        next[key] = [...(next[key] || []), issue.message];
+      }
+      setFields(next);
+      setError("Please correct the highlighted fields.");
+      return;
+    }
+    const body = new FormData();
+    body.set("payload", JSON.stringify(parsed.data));
+    const selected = form.getAll("files");
+    for (const file of selected) {
+      if (file instanceof File && file.size > 0) body.append("files", file);
+    }
+    const turnstile = form.get("cf-turnstile-response");
+    if (typeof turnstile === "string") body.set("turnstileToken", turnstile);
+    setPending(true);
+    try {
+      const response = await fetch("/api/complaints", { method: "POST", body });
+      const result = (await response.json().catch(() => null)) as (Success & { error?: string; fields?: Record<string, string[]> }) | null;
+      if (!response.ok || !result || !result.trackingNumber) {
+        setError(result?.error || "The complaint could not be submitted. Please try again.");
+        setFields(result?.fields || {});
+        return;
+      }
+      setSuccess(result);
+    } catch {
+      setError("The complaint could not be submitted. Please check your connection and try again.");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  if (success) {
+    return (
+      <article className="panel">
+        <h1>Complaint received</h1>
+        <p>Save both values below. This page will not show the secret key again.</p>
+        <div className="secret-box">
+          <p>
+            Tracking number
+            <br />
+            <code>{success.trackingNumber}</code>
+          </p>
+          <p>
+            Secret key
+            <br />
+            <code>{success.secretKey}</code>
+          </p>
+        </div>
+        <p style={{ marginTop: "1rem" }}>
+          {success.emailed
+            ? "An acknowledgement, including the key, has been sent or queued to the email address you gave."
+            : "No email was requested, or the address was left blank. The key exists only in this message."}
+        </p>
+        <p>Target response date: {new Date(success.dueAt).toLocaleString("en-PK", { timeZone: "Asia/Karachi" })} (Pakistan time).</p>
+        <p className="hint">Keep this key. A member of staff can issue a new one after confirming your identity.</p>
+        <p>
+          <Link className="btn" href="/track">
+            Track this complaint
+          </Link>
+        </p>
+      </article>
+    );
+  }
+
+  const groups = [...new Set(CATEGORIES.map((item) => item.group))];
+
+  return (
+    <form className="panel" onSubmit={onSubmit} noValidate method="post" action="/submit">
+      <h1>File a complaint</h1>
+      <p>Fields marked required must be completed.</p>
+      {error ? (
+        <div className="error-summary" role="alert" tabIndex={-1} ref={summaryRef}>
+          <strong>{error}</strong>
+          {Object.entries(fields).map(([key, messages]) =>
+            messages.map((message) => (
+              <div key={`${key}-${message}`}>
+                <a href={`#${key === "category" ? "category-group" : key}`}>{FIELD_LABELS[key] || key}</a>
+                {": "}
+                {message}
+              </div>
+            )),
+          )}
+        </div>
+      ) : null}
+
+      <fieldset>
+        <legend id="category-group">What is this about?</legend>
+        <div className="choice-grid">
+          {groups.map((group) => (
+            <div key={group} className="choice-group">
+              <p className="group-label">{group}</p>
+              {CATEGORIES.filter((item) => item.group === group).map((item) => (
+                <label className="choice" key={item.id}>
+                  <input
+                    type="radio"
+                    name="category"
+                    value={item.id}
+                    checked={category === item.id}
+                    onChange={() => onCategory(item.id)}
+                    required
+                  />
+                  <span>
+                    {item.en}
+                  </span>
+                </label>
+              ))}
+            </div>
+          ))}
+        </div>
+        {category && CATEGORY_HINTS[category as CategoryId] ? <p className="banner info">{CATEGORY_HINTS[category as CategoryId]}</p> : null}
+        {fieldMessage(fields, "category")}
+        {harassment ? (
+          <div className="field" style={{ marginTop: "0.8rem" }}>
+            <label htmlFor="harassmentType">Type of harassment (required)</label>
+            <select id="harassmentType" name="harassmentType" defaultValue="" required>
+              <option value="">Choose one</option>
+              <option value="sexual">Sexual harassment</option>
+              <option value="other">Other harassment</option>
+            </select>
+            {fieldMessage(fields, "harassmentType")}
+          </div>
+        ) : null}
+      </fieldset>
+
+      <fieldset>
+        <legend>About you</legend>
+        {harassment ? (
+          <p className="banner warn">Harassment complaints require your name, programme, semester, registration number, email, and mobile number. Your name and contact details will remain strictly confidential.</p>
+        ) : (
+          <p className="banner info">Your name, programme, semester, email, and mobile number are required for verification and will remain strictly confidential.</p>
+        )}
+        {fieldMessage(fields, "anonymous")}
+        <div className="fields">
+          <TextField
+            id="studentName"
+            label="Full name (required)"
+            fields={fields}
+            autoComplete="name"
+            required
+            hint="Your name and contact details are required for verification and will remain strictly confidential."
+          />
+          <div className="grid-2">
+            <div className="field">
+              <label htmlFor="programme">Programme (required)</label>
+              <input id="programme" name="programme" list="programmes" required maxLength={160} aria-invalid={fields.programme?.length ? true : undefined} />
+              <datalist id="programmes">
+                {PROGRAMME_SUGGESTIONS.map((item) => (
+                  <option key={item} value={item} />
+                ))}
+              </datalist>
+              {fieldMessage(fields, "programme")}
+            </div>
+            <div className="field">
+              <label htmlFor="semester">Semester (required)</label>
+              <select id="semester" name="semester" defaultValue="" required aria-invalid={fields.semester?.length ? true : undefined}>
+                <option value="">Choose your semester</option>
+                {SEMESTERS.map((item) => (
+                  <option key={item} value={item}>
+                    {semesterLabel(item)}
+                  </option>
+                ))}
+              </select>
+              {fieldMessage(fields, "semester")}
+            </div>
+          </div>
+          <TextField id="studentEmail" label="Email (required)" type="email" fields={fields} autoComplete="email" required />
+          <TextField id="studentPhone" label="Mobile number (required)" fields={fields} autoComplete="tel" required hint="Pakistani mobile, for example 03001234567." />
+          <TextField id="registrationNumber" label={harassment ? "Registration / roll number (required)" : "Registration / roll number"} fields={fields} required={harassment} />
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Where should it go?</legend>
+        <div className="grid-2">
+          <div className="field">
+            <label htmlFor="facultyId">Faculty (required)</label>
+            <select
+              id="facultyId"
+              value={facultyId}
+              onChange={(event) => setFacultyId(event.target.value)}
+              required
+            >
+              {org.map((faculty) => (
+                <option key={faculty.id} value={faculty.id}>
+                  {faculty.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="departmentId">Department (required)</label>
+            <select id="departmentId" value={departmentId} onChange={(event) => setDepartmentId(event.target.value)} required>
+              {departments.map((department) => (
+                <option key={department.id} value={department.id}>
+                  {department.name}
+                </option>
+              ))}
+            </select>
+            {fieldMessage(fields, "departmentId")}
+          </div>
+        </div>
+        <label className="check">
+          <input type="checkbox" name="concernsDepartmentHead" />
+          <span>The head of this department is involved. Do not send the complaint to the chairperson. Escalate it to the Dean and the Vice Chancellor.</span>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>What happened?</legend>
+        <div className="fields">
+          <TextField id="subject" label="Subject (required)" fields={fields} maxLength={180} />
+          <div className="field">
+            <label htmlFor="description">Description (required)</label>
+            <textarea id="description" name="description" required minLength={30} maxLength={8000} aria-invalid={fields.description?.length ? true : undefined} />
+            <span className="hint">What happened, when, and what you have already tried. At least a few sentences.</span>
+            {fieldMessage(fields, "description")}
+          </div>
+          <TextField id="desiredOutcome" label="What outcome do you want?" fields={fields} />
+          <div className="grid-2">
+            <TextField id="incidentDate" label="Date of the incident" type="date" fields={fields} />
+            <TextField id="location" label="Where did it happen?" fields={fields} />
+          </div>
+          <TextField id="respondentName" label="Who is the complaint about, if you want to say?" fields={fields} />
+          <div className="field">
+            <label htmlFor="files">Attachments</label>
+            <input id="files" name="files" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.docx,application/pdf,image/png,image/jpeg,image/webp" />
+            <span className="hint">Up to 2 files. PDF, PNG, JPEG, WEBP, or DOCX. 1 MB each.</span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Before you submit</legend>
+        <label className="check">
+          <input type="checkbox" name="confirmTruth" required />
+          <span>The information is true to the best of my knowledge.</span>
+        </label>
+        <label className="check">
+          <input type="checkbox" name="confirmPrivacy" required />
+          <span>
+            I have read the <Link href="/privacy">privacy notice</Link>.
+          </span>
+        </label>
+        <label className="check">
+          <input type="checkbox" name="confirmNonRetaliation" required />
+          <span>I understand that retaliation for making a complaint in good faith is prohibited, and that I can report it.</span>
+        </label>
+        {fieldMessage(fields, "confirmTruth")}
+        {fieldMessage(fields, "confirmPrivacy")}
+        {fieldMessage(fields, "confirmNonRetaliation")}
+        <div className="hp" aria-hidden="true">
+          <label htmlFor="companyWebsite">Company website</label>
+          <input id="companyWebsite" value={companyWebsite} onChange={(event) => setCompanyWebsite(event.target.value)} tabIndex={-1} autoComplete="off" />
+        </div>
+        {turnstileSiteKey ? <div className="cf-turnstile" data-sitekey={turnstileSiteKey} style={{ margin: "0.8rem 0" }} /> : null}
+        <button className="btn" type="submit" disabled={pending}>
+          {pending ? "Submitting…" : "Submit complaint"}
+        </button>
+      </fieldset>
+    </form>
+  );
+}
+
+function TextField({
+  id,
+  label,
+  type = "text",
+  fields,
+  hint,
+  autoComplete,
+  maxLength,
+  required,
+}: {
+  id: string;
+  label: string;
+  type?: string;
+  fields: Record<string, string[]>;
+  hint?: string;
+  autoComplete?: string;
+  maxLength?: number;
+  required?: boolean;
+}) {
+  return (
+    <div className="field">
+      <label htmlFor={id}>{label}</label>
+      <input id={id} name={id} type={type} autoComplete={autoComplete} maxLength={maxLength} required={required} aria-required={required || undefined} aria-invalid={fields[id]?.length ? true : undefined} />
+      {hint ? <span className="hint">{hint}</span> : null}
+      {fieldMessage(fields, id)}
+    </div>
+  );
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  category: "What this is about",
+  harassmentType: "Type of harassment",
+  anonymous: "Your identity",
+  facultyId: "Faculty",
+  departmentId: "Department",
+  programme: "Programme",
+  semester: "Semester",
+  subject: "Subject",
+  description: "Description",
+  desiredOutcome: "Outcome",
+  incidentDate: "Date of the incident",
+  location: "Location",
+  respondentName: "Who the complaint is about",
+  studentName: "Full name",
+  registrationNumber: "Registration / roll number",
+  studentEmail: "Email",
+  studentPhone: "Mobile number",
+  confirmTruth: "Truth confirmation",
+  confirmPrivacy: "Privacy notice",
+  confirmNonRetaliation: "Non-retaliation acknowledgement",
+};
+
+function fieldMessage(fields: Record<string, string[]>, key: string) {
+  const messages = fields[key];
+  if (!messages?.length) return null;
+  return (
+    <span className="field-error" role="alert">
+      {messages[0]}
+    </span>
+  );
+}
