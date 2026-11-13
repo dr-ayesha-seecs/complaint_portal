@@ -8,9 +8,7 @@ export default function HomePage() {
     <div className="wrap">
       <section className="hero">
         <div className="panel">
-          <p className="brand-kicker" style={{ color: "var(--gold)" }}>
-            Muhammad Nawaz Shareef University of Agriculture, Multan
-          </p>
+          <p className="eyebrow">Students Complaints Portal</p>
           <h1>A recorded way to raise a student complaint</h1>
           <hr className="gold-rule" />
           <p className="lede">

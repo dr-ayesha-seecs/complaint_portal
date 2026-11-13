@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import { getCurrentUser } from "@/lib/current-user";
 import { canManageDirectory, canManageUsers, canViewAudit, canViewComplaints, ROLE_LABELS } from "@/lib/rbac";
 
@@ -18,33 +19,23 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="staff-shell">
-      <header className="staff-bar">
-        <div className="staff-inner">
-          <div className="staff-meta">
-            <div>
-              <p className="brand-kicker">MNSUAM complaints desk</p>
-              <strong>
-                {user.name} · {ROLE_LABELS[user.role]}
-              </strong>
-            </div>
-            <form action="/api/auth/logout" method="post">
-              <button className="btn secondary" type="submit">
-                Sign out
-              </button>
-            </form>
-          </div>
-          <nav className="nav" aria-label="Staff">
-            {links.map((link) => (
-              <Link key={link.href} href={link.href}>
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </header>
+      <SiteHeader links={links} brandHref="/dashboard">
+        <span className="user-chip">
+          <span className="chip-text">
+            {user.name}
+            <small>{ROLE_LABELS[user.role]}</small>
+          </span>
+        </span>
+        <form action="/api/auth/logout" method="post">
+          <button className="btn secondary small" type="submit">
+            Sign out
+          </button>
+        </form>
+      </SiteHeader>
       <main id="content" className="wrap">
         {children}
       </main>
+      <SiteFooter />
     </div>
   );
 }
