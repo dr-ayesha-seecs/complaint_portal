@@ -1,3 +1,5 @@
+import { isCommitteeCategory } from "./policy";
+
 export const ROLES = ["admin", "vice_chancellor", "dean", "chairperson", "staff", "harassment_focal"] as const;
 export type Role = (typeof ROLES)[number];
 
@@ -7,7 +9,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   dean: "Dean",
   chairperson: "Chairperson",
   staff: "Complaints staff",
-  harassment_focal: "Harassment focal person",
+  harassment_focal: "Anti-bullying and harassment committee",
 };
 
 export type SessionUser = {
@@ -62,8 +64,9 @@ export function assignmentError(
 
 /**
  * Central complaints staff (no faculty and no department) can work every file
- * except harassment. Harassment stays with the Vice Chancellor, the relevant
- * dean and chairperson, and the harassment focal person.
+ * except bullying, discrimination and harassment. Those files stay with the
+ * Vice Chancellor, the relevant dean and chairperson, and the Committee of
+ * Anti-Bullying and Harassment Monitoring.
  * System administrators do not see complaint contents. A user may also gain
  * access to one file if the Vice Chancellor assigns it to them.
  */
@@ -71,13 +74,13 @@ export function canAccessComplaint(user: SessionUser, complaint: ScopedComplaint
   if (!user.active) return false;
   if (user.role === "admin") return false;
   if (user.role === "vice_chancellor") return true;
-  if (user.role === "harassment_focal") return complaint.category === "harassment";
+  if (user.role === "harassment_focal") return isCommitteeCategory(complaint.category);
   if (user.role === "dean") return Boolean(user.facultyId) && user.facultyId === complaint.facultyId;
   if (user.role === "chairperson") return Boolean(user.departmentId) && user.departmentId === complaint.departmentId;
   if (user.role === "staff") {
     if (user.departmentId) return user.departmentId === complaint.departmentId;
     if (user.facultyId) return user.facultyId === complaint.facultyId;
-    return complaint.category !== "harassment";
+    return !isCommitteeCategory(complaint.category);
   }
   return false;
 }
@@ -89,7 +92,7 @@ export function scopeClause(user: SessionUser, alias = "c"): { sql: string; args
   if (user.role === "vice_chancellor") return { sql: "1 = 1", args: [] };
 
   let roleScope: { sql: string; args: string[] };
-  if (user.role === "harassment_focal") roleScope = { sql: `${column("category")} = 'harassment'`, args: [] };
+  if (user.role === "harassment_focal") roleScope = { sql: `${column("category")} IN ('harassment', 'discrimination', 'bullying_ragging')`, args: [] };
   else if (user.role === "dean") {
     if (!user.facultyId) return { sql: "0 = 1", args: [] };
     roleScope = { sql: `${column("faculty_id")} = ?`, args: [user.facultyId] };
@@ -99,7 +102,7 @@ export function scopeClause(user: SessionUser, alias = "c"): { sql: string; args
   } else if (user.role === "staff") {
     if (user.departmentId) roleScope = { sql: `${column("department_id")} = ?`, args: [user.departmentId] };
     else if (user.facultyId) roleScope = { sql: `${column("faculty_id")} = ?`, args: [user.facultyId] };
-    else roleScope = { sql: `${column("category")} != 'harassment'`, args: [] };
+    else roleScope = { sql: `${column("category")} NOT IN ('harassment', 'discrimination', 'bullying_ragging')`, args: [] };
   } else {
     return { sql: "0 = 1", args: [] };
   }

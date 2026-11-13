@@ -1,3 +1,4 @@
+import { isCommitteeCategory } from "@/lib/policy";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ExportButton } from "@/components/ExportButton";
@@ -150,7 +151,7 @@ export default async function ComplaintsPage({
               <tr key={item.id}>
                 <td data-label="Tracking">
                   <Link href={`/dashboard/complaints/${item.id}`}>{item.trackingNumber}</Link>
-                  {item.category === "harassment" ? <span className="sub">Confidential</span> : null}
+                  {isCommitteeCategory(item.category) ? <span className="sub">Confidential</span> : null}
                 </td>
                 <td data-label="Subject">
                   {item.subject}

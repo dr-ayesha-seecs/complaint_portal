@@ -19,19 +19,16 @@ If the head of department is involved, the student can say so. The chairperson i
 
 ## How the standards are applied
 
-The in-portal procedure (`/procedure`) is the page students should be able to read from the university site. In short:
+The in-portal procedure (`/procedure`) and privacy notice (`/privacy`) follow the university's adopted arrangements:
 
 | Source | What this portal takes from it |
 | --- | --- |
-| [HEC grievance redressal](https://www.hec.gov.pk/english/services/students/pages/grp.aspx) and the HEC system-of-grievance standards used in the ODL policy (a time for every stage, an online reference number, status tracking, confidentiality, a chance to withdraw, access for students with disabilities) | Immediate reference number, status page, category list covering the HEC types (admission, fees, scholarships, evaluation, discrimination, harassment, administration, bribery), and a route for disability complaints |
-| HEC Policy on Protection Against Sexual Harassment in HEIs, effective 1 July 2020 (see the [HEC note on the policy](https://www.hec.gov.pk/english/NAHE/CDP/Pages/Protection-Against-Sexual-Harassment-Policy.aspx)) | Harassment cannot be anonymous; this portal also requires a name on every other complaint, kept confidential. Target to pass the file on within **24 hours**. Inquiry recommendation within **30 days**. Appeal within **30 days**. Confidential file. Prohibition on retaliation |
-| Protection against Harassment of Women at the Workplace Act, 2010 | The same 30-day inquiry window, and the note that an Ombudsperson appeal remains available where the Act applies. This portal does not replace that appeal |
-| UK [OIA Good Practice Framework](https://www.oiahe.org.uk/resources-and-publications/good-practice-framework) | Early resolution where it fits, a formal stage, a review (appeal) stage, and an outcome normally inside **90 calendar days** |
-| ISO 10002 (complaints handling) | Free to use, visible procedure, acknowledgement, tracking, impartial handling, a response, and closure. The audit log supports accountability |
+| Registrar notification No. **MNS-UAM/PO/75/1800** dated **02 October 2023**, issued after the Vice Chancellor approved the recommendations of the Executive Committee in its 39th/2023 meeting held on 26 September 2023 | Constitutes the **Committee of Anti-Bullying and Harassment Monitoring** (Convener: Dr. Ayesha Hakim; members as notified, including the Director Student Affairs (Female) in the case of a student, the Deputy Registrar (HR), and a member/secretary). The committee implements the Anti-Bullying and Harassment Policy on campus, arranges guidance sessions, explains the reporting process, and submits a report to the proper forum for further inquiry and action. Bullying, discrimination and harassment files are routed to this committee. |
+| Anti-Discrimination-Anti-Harassment complaint procedure adopted for use with that committee | No anonymous filing on this portal (name, programme, semester, email and mobile number are required and kept strictly confidential). Prompt, thorough and impartial investigation, completed within **45 days** where possible, with notice to the complainant if more time is needed. Both parties are heard. An investigatory file is kept. Findings go to both parties and the relevant dean or director. The head of department confirms remedial action within **14 days**. Records of these complaints are kept for **seven years** after the investigation concludes. Confidentiality to the greatest extent possible. A clear prohibition on retaliation, including against witnesses and people associated with the complainant. |
 
-**Ordinary complaints.** Automatic acknowledgement at once. A person should acknowledge the file within **2 working days** (Monday–Friday, Asia/Karachi). Written outcome within **20 working days**, extendable with reasons up to 40 working days, and still inside 90 calendar days. Appeal within **10 working days** of the outcome; the review is due within **15 working days**.
+**Ordinary complaints.** Automatic acknowledgement at once. A person should acknowledge the file within **2 working days** (Monday–Friday, Asia/Karachi). Written outcome within **20 working days**, extendable with reasons up to 40 working days. A student may ask for the outcome to be reviewed within **10 working days**; that review is due within **15 working days**.
 
-**Harassment.** Acknowledgement at once. Referral target **24 hours**. Inquiry recommendation within **30 calendar days**, implementation of an endorsed decision within **7 days**. Appeal within **30 calendar days**; the appellate decision is due within **30 calendar days**.
+**Bullying, discrimination and harassment.** Automatic acknowledgement at once, and notification of the official committee. A person should acknowledge the file within **2 working days**. Investigation target **45 calendar days**, extendable with notice to the student. Confirmation of remedial action within **14 days**. The committee reports to the proper forum. A student may ask the Registrar or the Vice Chancellor to review how the file was handled. A withdrawal is recorded as a request, because the university may still have to inquire.
 
 Overdue files are flagged on the staff dashboard. There is no background cron: the overdue state is calculated whenever someone opens the desk.
 
@@ -44,9 +41,9 @@ Overdue files are flagged on the staff dashboard. There is no background cron: t
 | `dean` | One faculty | Yes, for that faculty |
 | `chairperson` | One department | Yes, for that department |
 | `staff` | One department, or one faculty, or (if neither is set) all **non-harassment** complaints, plus any file assigned by the Vice Chancellor | Yes, inside that boundary |
-| `harassment_focal` | Harassment complaints only, plus any file assigned by the Vice Chancellor | Yes, for those files |
+| `harassment_focal` | Bullying, discrimination and harassment complaints, plus any file assigned by the Vice Chancellor | Yes, for those files |
 
-Deans and chairpersons do see harassment files in their own faculty or department, because they are the people notified. Central unassigned staff do not. Export is available to every signed-in role that can see complaints, but only for the rows that role can already see. A system administrator (`admin`) is the only person who can edit contacts, create or deactivate accounts, and read the audit log. The Vice Chancellor has read-only access to complaints and can assign a file to another officer.
+Deans and chairpersons do see bullying, discrimination and harassment files in their own faculty or department, because they are the people notified. Central unassigned staff do not. Export is available to every signed-in role that can see complaints, but only for the rows that role can already see. A system administrator (`admin`) is the only person who can edit contacts, create or deactivate accounts, and read the audit log. The Vice Chancellor has read-only access to complaints and can assign a file to another officer.
 
 Passwords are hashed with bcrypt. Sessions last 8 hours in an httpOnly cookie. Mutating requests must come from the same site. Inputs are checked with Zod. Complaint submission, tracking, appeals, and sign-in are rate limited. A hidden honeypot field drops obvious spam. If `TURNSTILE_SECRET_KEY` is set, Cloudflare Turnstile is required as well. Staff views and changes are written to an audit log. IP addresses on complaints are stored only as a hash.
 
@@ -65,7 +62,7 @@ To set real addresses:
 
 While email delivery is in log-only mode, placeholder addresses are still recorded so you can see who would have been notified. Once SMTP or Resend is configured, placeholder addresses are **not sent**. They are stored in `mail_log` as `skipped_placeholder`. The overview page counts how many placeholders remain.
 
-Harassment complaints are emailed to the focal person and the committee only when those settings have an address. They ship as placeholders until you replace them.
+Bullying, discrimination and harassment complaints are emailed to the Committee of Anti-Bullying and Harassment Monitoring only when those settings have an address. They ship as placeholders until you replace them.
 
 ## Environment variables
 
@@ -162,8 +159,8 @@ Suggested menu label: **Student complaints**.
 - The Vice Chancellor is not copied on every complaint. They see all files on the dashboard. They are emailed when a complaint is escalated to them, when the student says the head of department is involved, and when a student appeals.
 - A student name is mandatory on every complaint, even if someone calls the API directly. Anonymous submissions are rejected.
 - Historical anonymous files, if any, still cannot have their tracking keys recovered. A named student can be given a new key after a member of staff confirms their identity. That action is audited.
-- Retention stated in the privacy notice (3 years for ordinary files, 7 years for harassment files) is a proposed rule for the Registrar to confirm. The software does not delete files on a timer.
-- The privacy notice and procedure should be read by the Registrar before the portal is announced. They describe how this software behaves; they are not a substitute for a signed university statute.
+- Investigatory files for bullying, discrimination and harassment are retained for seven years after the investigation concludes, as set out in the adopted complaint procedure. Ordinary files are kept as university records and later reviewed for deletion. The software does not delete files on a timer.
+- The public procedure and privacy notice describe the official committee and the adopted complaint procedure. They are not a substitute for the Registrar's notification or for any later university statute.
 - CSV export and attachment download are limited to staff who may already open that complaint. Students keep their own copies of attachments. The tracking page does not offer a second download link, so the secret key is never used as a file URL.
 - No third-party analytics or font CDN is loaded. The portal is English only.
 - `npm run build` does not need a database. Pages that read complaints are rendered on request.

@@ -49,12 +49,14 @@ describe("standards helpers", () => {
     expect(addWorkingDays(friday, 1).toISOString()).toBe("2026-11-16T05:00:00.000Z");
   });
 
-  it("uses a 30-day clock for harassment and 20 working days otherwise", () => {
+  it("uses a 45-day clock for committee cases and 20 working days otherwise", () => {
     const start = new Date("2026-11-10T05:00:00.000Z");
     const harassment = computeSla("harassment", start);
     const standard = computeSla("academic_grading", start);
     expect(harassment.profile).toBe("harassment");
-    expect(harassment.dueAt).toBe(new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString());
+    expect(harassment.dueAt).toBe(new Date(start.getTime() + 45 * 24 * 60 * 60 * 1000).toISOString());
+    expect(computeSla("discrimination", start).dueAt).toBe(harassment.dueAt);
+    expect(computeSla("bullying_ragging", start).dueAt).toBe(harassment.dueAt);
     expect(standard.profile).toBe("standard");
     expect(isOverdue(standard.dueAt, "resolved", new Date("2030-01-01T00:00:00.000Z"))).toBe(false);
     expect(isOverdue(standard.dueAt, "submitted", new Date("2030-01-01T00:00:00.000Z"))).toBe(true);
@@ -201,6 +203,10 @@ describe("routing and access", () => {
     expect(canAccessComplaint(central, harassment)).toBe(false);
     expect(canAccessComplaint(focal, harassment)).toBe(true);
     expect(canAccessComplaint(focal, academic)).toBe(false);
+    const discrimination = { facultyId: "foc", departmentId: "foc-aids", category: "discrimination" };
+    expect(canAccessComplaint(central, discrimination)).toBe(false);
+    expect(canAccessComplaint(focal, discrimination)).toBe(true);
+    expect(canAccessComplaint(chair, discrimination)).toBe(true);
     expect(scopeClause(other).sql).toContain("department_id");
   });
 
@@ -217,6 +223,15 @@ describe("routing and access", () => {
     });
     expect(recipients.map((item) => item.role)).toEqual(["dean", "vice_chancellor", "harassment_focal", "harassment_committee"]);
     expect(recipients.every((item) => item.placeholder)).toBe(true);
+    const bullying = buildRecipientList({
+      category: "bullying_ragging",
+      chairEmail: "placeholder+foc-aids-chair@mnsuam.invalid",
+      deanEmail: "placeholder+foc-dean@mnsuam.invalid",
+      focalEmail: "placeholder+harassment-focal@mnsuam.invalid",
+      committeeEmail: "placeholder+harassment-committee@mnsuam.invalid",
+      notifyChair: true,
+    });
+    expect(bullying.map((item) => item.role)).toEqual(["chairperson", "dean", "harassment_focal", "harassment_committee"]);
   });
 
   it("keeps the harassment narrative out of the staff email", () => {
@@ -237,6 +252,9 @@ describe("routing and access", () => {
     expect(message.text).not.toContain(narrative);
     expect(message.text).not.toContain("Test Student");
     expect(message.subject).toContain("Confidential");
+    expect(message.text).toContain("Committee of Anti-Bullying and Harassment Monitoring");
+    expect(message.text).not.toContain("HEC Policy");
+    expect(message.text).not.toContain("2010");
   });
 
   it("escapes CSV cells", () => {

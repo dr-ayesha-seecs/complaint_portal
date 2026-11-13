@@ -30,9 +30,11 @@ export function categoryLabel(id: string): string {
 }
 export const CATEGORY_HINTS: Partial<Record<CategoryId, string>> = {
   harassment:
-    "Your full name, registration number, department, programme, email, and mobile number are required. Your name will remain strictly confidential. Retaliation for reporting is prohibited.",
+    "Your full name, registration number, department, programme, email, and mobile number are required. Your name will remain strictly confidential. The file goes to the Committee of Anti-Bullying and Harassment Monitoring. Retaliation for reporting is prohibited.",
+  discrimination:
+    "Your name, programme, semester, email, and mobile number are required for verification and will remain strictly confidential. The file goes to the Committee of Anti-Bullying and Harassment Monitoring. Retaliation for reporting is prohibited.",
   bullying_ragging:
-    "Your name is required for verification and will remain strictly confidential. If someone is in immediate danger, contact campus security or the police before using this portal.",
+    "Your name, programme, semester, email, and mobile number are required for verification and will remain strictly confidential. The file goes to the Committee of Anti-Bullying and Harassment Monitoring. If someone is in immediate danger, contact campus security or the police before using this portal.",
   safety_security:
     "If you or someone else is in immediate danger, contact campus security or the police first. This portal is not an emergency service.",
   disability_access:

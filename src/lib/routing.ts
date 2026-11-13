@@ -1,3 +1,4 @@
+import { isCommitteeCategory } from "./policy";
 import { isPlaceholderEmail } from "./ids";
 
 export type RecipientRole = "chairperson" | "dean" | "harassment_focal" | "harassment_committee" | "vice_chancellor";
@@ -30,7 +31,7 @@ export function buildRecipientList(input: {
   if (input.notifyChair) push(input.chairEmail, "chairperson");
   if (input.notifyDean !== false) push(input.deanEmail, "dean");
   if (input.notifyVc) push(input.vcEmail, "vice_chancellor");
-  if (input.category === "harassment") {
+  if (isCommitteeCategory(input.category)) {
     push(input.focalEmail, "harassment_focal");
     push(input.committeeEmail, "harassment_committee");
   }

@@ -4,6 +4,7 @@ import { ComplaintActions } from "@/components/ComplaintActions";
 import { ComplaintAssign } from "@/components/ComplaintAssign";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getComplaintForUser, listAssignableUsers } from "@/lib/complaints";
+import { isCommitteeCategory } from "@/lib/policy";
 import { categoryLabel, semesterLabel } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/current-user";
 import { canAssignComplaint, canHandleComplaint } from "@/lib/rbac";
@@ -34,9 +35,9 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
         <p>
           <StatusBadge status={complaint.status} overdue={complaint.overdue} /> · Handling level: {escalationLabel(complaint.escalationLevel)}
         </p>
-        {complaint.category === "harassment" ? (
+        {isCommitteeCategory(complaint.category) ? (
           <p className="banner danger">
-            Confidential harassment file. Do not forward it. Retaliation against the student or a witness is prohibited. Handle it under the HEC 2020 policy and, where it applies, the 2010 Act.
+            Confidential file for the Committee of Anti-Bullying and Harassment Monitoring. Do not forward it. Retaliation against the student or a witness is prohibited. Handle it under the university&apos;s Anti-Bullying and Harassment Policy. The investigation should be completed within 45 days where possible.
           </p>
         ) : null}
         {complaint.concernsDepartmentHead ? (

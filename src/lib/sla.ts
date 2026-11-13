@@ -1,14 +1,22 @@
 import type { CategoryId } from "./categories";
 
+import { isCommitteeCategory } from "./policy";
+
 /**
- * Institutional timelines aligned with:
- * - HEC grievance-redressal standards (a time for every stage, a reference number, privacy)
- * - HEC Policy on Protection Against Sexual Harassment in HEIs (2020): referral within
- *   24 hours, inquiry recommendation within 30 days, appeal within 30 days
- * - Protection against Harassment of Women at the Workplace Act, 2010 (inquiry and appeal windows)
- * - UK OIA Good Practice Framework: early resolution, a formal stage normally inside
- *   90 calendar days, and a review stage
- * - ISO 10002: acknowledgement, tracking, investigation, response, and closure
+ * Institutional timelines.
+ *
+ * Ordinary complaints use the portal's published service standards: a person
+ * acknowledges the file within 2 working days, and a written outcome is due
+ * within 20 working days (extendable with reasons).
+ *
+ * Bullying, discrimination and harassment files follow the investigation
+ * timetable in the Anti-Discrimination-Anti-Harassment complaint procedure
+ * adopted for use with the Committee of Anti-Bullying and Harassment
+ * Monitoring (Registrar notification No. MNS-UAM/PO/75/1800 dated
+ * 02 October 2023): a prompt, thorough and impartial investigation, to be
+ * completed within 45 days where possible, with notice to the complainant
+ * if that period has to be extended; the relevant head of department
+ * confirms remedial action to the dean or director within 14 days.
  *
  * Working days are Monday to Friday in Asia/Karachi. The university can record an
  * extension, but the portal flags the file as overdue once `dueAt` has passed.
@@ -23,9 +31,8 @@ export const SLA = {
     appealDecisionWorkingDays: 15,
   },
   harassment: {
-    referralHours: 24,
-    inquiryCalendarDays: 30,
-    implementationDays: 7,
+    inquiryCalendarDays: 45,
+    implementationDays: 14,
     appealWindowCalendarDays: 30,
     appealDecisionCalendarDays: 30,
   },
@@ -92,14 +99,14 @@ export type SlaClock = {
 };
 
 export function isHarassmentCategory(category: string): boolean {
-  return category === "harassment";
+  return isCommitteeCategory(category);
 }
 
 export function computeSla(category: string, createdAt: Date): SlaClock {
   if (isHarassmentCategory(category)) {
     return {
       profile: "harassment",
-      ackDueAt: new Date(createdAt.getTime() + SLA.harassment.referralHours * 60 * 60 * 1000).toISOString(),
+      ackDueAt: addWorkingDays(createdAt, SLA.standard.humanAckWorkingDays).toISOString(),
       dueAt: addCalendarDays(createdAt, SLA.harassment.inquiryCalendarDays).toISOString(),
     };
   }

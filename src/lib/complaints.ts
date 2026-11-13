@@ -21,6 +21,7 @@ import {
   karachiStartIso,
   type SlaProfile,
 } from "./sla";
+import { isCommitteeCategory } from "./policy";
 import { categoryLabel, OPEN_STATUSES, statusLabel, STATUSES, type Status } from "./categories";
 import { complaintSchema, fieldErrorsFromZod, isEmailAddress, isPakistanMobile, normalizePhone } from "./validation";
 import { verifyTurnstile } from "./turnstile";
@@ -335,7 +336,7 @@ export async function submitComplaint(
       category: input.category,
       dueAt: sla.dueAt,
       appUrl: ctx.appUrl,
-      harassment: input.category === "harassment",
+      harassment: isCommitteeCategory(input.category),
     });
     const result = await deliverEmail({ to: identity.email, subject: message.subject, text: message.text, complaintId: id });
     emailed = result === "sent" || result === "logged";
@@ -472,10 +473,10 @@ export async function withdrawComplaint(trackingNumber: string, secret: string, 
     throw new HttpError(400, "This complaint can no longer be withdrawn.");
   }
   const now = new Date().toISOString();
-  const next: Status = loaded.category === "harassment" ? "withdrawal_requested" : "withdrawn";
+  const next: Status = isCommitteeCategory(loaded.category) ? "withdrawal_requested" : "withdrawn";
   const message =
     next === "withdrawal_requested"
-      ? "You asked to withdraw this complaint. Because it concerns harassment, the university may still have a duty to look into it. The office will confirm what happens next."
+      ? "You asked to withdraw this complaint. Because it concerns bullying, discrimination or harassment, the university may still have a duty to look into it. The office will confirm what happens next."
       : "You withdrew this complaint. The university will take no further action unless a fresh complaint is filed.";
   await getClient().execute({
     sql: "UPDATE complaints SET status = ?, updated_at = ?, resolved_at = COALESCE(resolved_at, ?) WHERE id = ?",
@@ -877,7 +878,7 @@ export async function applyComplaintAction(
         category: detail.category,
         dueAt: detail.dueAt,
         appUrl,
-        harassment: detail.category === "harassment",
+        harassment: isCommitteeCategory(detail.category),
       });
       await deliverEmail({
         to: detail.studentEmail,
