@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: `%s | ${UNIVERSITY_SHORT} Complaints`,
   },
   description: `File and track a student complaint at ${UNIVERSITY_NAME}. Confidential handling, a tracking number, and published response times.`,
-  robots: { index: true, follow: true },
+  robots: { index: false, follow: false },
 };
 
 export const viewport: Viewport = {
