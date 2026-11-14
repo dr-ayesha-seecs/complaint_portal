@@ -1,63 +1,145 @@
-# Handover: Students Complaints Portal
+# MNSUAM handover (15 Nov 2026, Asia/Karachi)
 
-**Date:** 13 November 2026 (Asia/Karachi)
+This is the starting point for the next bot. Work is paused because weekly credits are nearly exhausted (about 92–95% used as of 14–15 Nov 2026). The weekly limit resets on Saturday, 21 Nov 2026, 4:04 PM PKT. The owner (Shoaib Ali / Dr. Ayesha) will finish testing the new sites before any live switch, and may buy extra credits if needed. **Nothing goes live until the owner gives an explicit thumbs-up.**
 
-This is the short Complaints Portal handover. The full brief for all three systems (website, FIS, Complaints Portal), including standing decisions and the combined cPanel checklist, is:
+A shared copy of this file also lives at `/workspace/HANDOVER-mnsuam.md` on the box.
 
-**https://github.com/dr-ayesha-seecs/mnsuam_website/blob/cursor/mnsuam-preview-upload-b950/HANDOVER.md**
+## Hard rules
 
-(Also `HANDOVER.md` at the root of `dr-ayesha-seecs/mnsuam_website` on branch `cursor/mnsuam-preview-upload-b950`. That branch's PR #1 is not merged; the website `main` is untouched.)
+- Never touch live sites (`https://mnsuam.edu.pk`, `https://fis.mnsuam.edu.pk`, live cPanel, live FIS/Namecheap, or the live database) before the owner's thumbs-up.
+- Never merge to `main` without the owner's approval. Work only on the `vercel-test` branch (or another named working branch). Do not force-push `main`.
+- Do not put secrets, passwords, tokens, or login files in chat or in commits. Exclude `secrets/` directories, `*.env`, tokens, passwords, and test-login files.
+- Credentials belong only in the owner's vault. Vault ids (values are not in this document):
+  - cPanel: `4663144`
+  - webadmin: `4663167`
+- Box secret file locations (paths only; do not open, print, or commit them unless the owner has asked you to use one and you can keep the value out of chat and git):
+  - `/workspace/secrets/complaint_portal_pepper.txt`
+  - `/workspace/secrets/complaint_portal_site.json`
+  - `/workspace/fis-vercel/secrets/` (`admin_password`, `app_secret`, `fis-my-login.txt`, `fis-test-logins.json`, `tidb.env`)
+  - `/workspace/fis-vercel/test-login.txt`
+  - `/workspace/complaints-vercel/secrets/` (`VC_PASSWORD`, `BOOTSTRAP_VC_PASSWORD`, `BOOTSTRAP_ADMIN_PASSWORD`, `BOOTSTRAP_RESET_PASSWORDS`, `ADMIN_PASSWORD`, `SECRET_PEPPER`, `TURSO_AUTH_TOKEN`, `portal.env`, `portal-test-logins.txt`, `new-logins.json`)
+  - `/workspace/complaints-vercel/test-login.txt`
+  - `/workspace/vercel-test/token.txt`
+  - `/workspace/vercel-test/url.txt`
+- FIS test logins were previously copied to a file in the owner's Downloads (`fis-test-logins.txt`) and should be deleted once noted. Those logins work only on the test FIS, not live FIS.
+- Keep this university website/FIS/portal work separate from ADP (Annual Development Programme) work.
+- Do not leave a Netlify complaints URL (`https://mnsuam-complaints.netlify.app`) on the test or live website.
 
-Product, policy, environment variables, and local setup: **`README.md`**.
+## Test URLs (current targets)
 
----
+- Website: https://mnsuam-website-test.vercel.app
+- FIS: https://mnsuam-fis-test.vercel.app
+- Complaints Portal: https://mnsuam-complaints-test.vercel.app
+- Website assets project: `mnsuam-website-test-assets` (site-images, proxied by the main site at `/site-images/*`)
 
-## Current state of this repository
+An older Next.js Netlify demo (`https://mnsuam-website-demo.netlify.app`) is not the current test site. Do not treat it as the go-live candidate.
 
-| | |
-| --- | --- |
-| Repository | https://github.com/dr-ayesha-seecs/complaint_portal |
-| Work branch | `cursor/mnsuam-complaints-portal-08fe` |
-| Latest commit | `93ed7971bdd1ccc559522fbbec518b8358bd2cf5` — *Match the complaints portal theme to the new university website.* |
-| Policy/SLA wording | `a35657197b6024e6654f551f9563a40dad3a7bcd` — *Remove notification numbers and committee constitution details from the public pages.* (after `5c0171a`, which aligned `/procedure` and `/privacy` with the adopted policies) |
-| Pull request | [PR #1](https://github.com/dr-ayesha-seecs/complaint_portal/pull/1) — **open**, base `main` |
-| `main` | **untouched** — `ccb5e9187917b4c0c3c2fc04d2f9526ee30d3655` (*Initial commit*, 10 Nov 2026). Do not merge until the owner says ready. |
-| Published site | https://mnsuam-complaints.netlify.app — **new deploys blocked** because the Netlify team "AI and DS" has exceeded its account credit usage. The last successful publish may be older than `93ed797`. |
-| Database | Turso (libSQL) in production; local `data/local.db` for development |
-| Tests | `npm test` — 23/23 `it()` cases in `tests/portal.test.ts` (last reported run before `93ed797` passed; production build succeeded) |
+## Vercel
 
----
+- Team slug: `dr-ayesha-seecs`
+- Projects: `mnsuam-website-test`, `mnsuam-website-test-assets`, `mnsuam-fis-test`, `mnsuam-complaints-test`
+- FIS test region: `sin1`
+- The Vercel connector may 403 on this team until the owner approves team access. Prefer existing deploy scripts and the owner's approval rather than fighting the connector.
 
-## Theme and configuration
+## GitHub repositories and branches
 
-Commit `93ed797` aligns colours, typography (**Plus Jakarta Sans** headings, **Inter** body), official emblem, two-line university name, sticky header, top bar, and footer with the new university website. Header and footer must not link to old Joomla pages.
+Do not merge these working branches into `main`.
 
-Production website origin:
+### 1) Website (current static Vercel test site)
 
-```bash
-NEXT_PUBLIC_UNIVERSITY_SITE_URL=https://mnsuam.edu.pk
-```
+- Box workdir: `/workspace/vercel-test` (this is the current site; it was not a git repo until this handover).
+- Intended GitHub repo: `https://github.com/dr-ayesha-seecs/mnsuam_website` (private). That repo already holds the earlier Next.js preview on branch `cursor/mnsuam-preview-upload-b950` (commit `49e41fca6c8c48138a04efed1e092cb5ec2e3273`) and `main` (`8f1a19d32ff0406f2ca56c91fb69d50cf6f1e0bf`). Those branches must be left alone.
+- Working branch for the current static site: `vercel-test` (orphan branch of build scripts, maps, QA, and this handover — not the 2 GB HTML tree).
+- If this branch could not be pushed, the local repo and a git bundle (if created) are on the box; see the "Push status" section at the bottom of the shared copy, or `git -C /workspace/vercel-test log -1`.
+- Build/source notes:
+  - Build pipeline and widget: `/workspace/vercel-test/fis/` (`build.sh`, `fis-widget.js`, `fis-dept-map` wiring in `wire-fis-widget.py`, `content-format.py` / `content-format.css`, `final-pass.py`, `aids-content.py`, `department-map.csv`, `office-canonical.py`, `qa-fix.py`, and related scripts).
+  - Deploy parts / tarball: `/workspace/vercel-test/main/` (`site.tar.xz`, split `part-*` upload chunks, `vercel.json`, `build.sh`). Do not commit tokens or `.b64` upload payloads.
+  - Older/full HTML tree on the box: `/workspace/webnew/site` (about 2.2 GB).
+  - Latest local build used by the final pass: `/tmp/vw-qa-build/public`.
+  - QA: `/workspace/vercel-test/qa-report.md` (tested the 14 Nov 2026, 10:10 PM PKT deploy) and `/workspace/vercel-test/DEPLOY.md`.
 
-The current default in `src/lib/university.ts` and `.env.example` is `https://mnsuam-website-demo.netlify.app`. Change it when the public website is live. Also set `NEXT_PUBLIC_APP_URL` to this portal's own public origin.
+### 2) FIS (Faculty Information System)
 
-Full university name: **Muhammad Nawaz Shareef University of Agriculture, Multan** (Shareef with `ee`). Do not use `MNS - …` or `MNSUAM` in headings, titles, or badges.
+- Box git repo: `/workspace/fis-vercel/src` (branch `vercel-test`).
+- GitHub repo: `https://github.com/dr-ayesha-seecs/FIS` (private). GitHub has only `main` at `9c4366b524f82d55e966a52cde8b2ed4e0a6445f` (pushed 13 Nov 2026). The local `vercel-test` history does not contain that SHA; it started from a snapshot noted as "FIS main @ab22618". Do not merge or force-push to `main`.
+- Local `vercel-test` tip before this handover commit: `dbd3d95` ("static CORS + SWR caching for /api-cache, pre-built feed seed for cold starts").
+- Useful files outside the git root (copy into the repo if missing, but never copy `secrets/`):
+  - `/workspace/fis-vercel/DEPLOY-STEPS.md`
+  - `/workspace/fis-vercel/department-map.csv`
+  - `/workspace/fis-vercel/tools/` and import helpers at `/workspace/fis-vercel/src/` (`import_all.py`, `build_bundle.sh`, and related scripts)
+- Test deploy is a small loader bundle: `vercel.json`, `api/index.php`, `api/app.tgz`, `api/photos.tgz`, built with `tools/build_bundle.sh`. After a large faculty import, refresh `vercel/feed-seed` from the live test feed, then rebuild the bundle.
 
----
+### 3) Complaints Portal
 
-## Would a cPanel publish of the other repos replace this portal?
+- Box git repo: `/workspace/complaints-vercel/src` (branch `vercel-test`).
+- GitHub repo: `https://github.com/dr-ayesha-seecs/complaint_portal`.
+- Remote heads as of this handover: `main` `ccb5e9187917b4c0c3c2fc04d2f9526ee30d3655`, and `cursor/mnsuam-complaints-portal-08fe` `d8fb487c7f8feb85d36ca1224d1bab119c70be1f`.
+- Local `vercel-test` tip before this handover commit: `5097069` ("Let officers who can view a complaint add an internal note on the case page."). That branch had not yet been pushed.
+- A second clone, `/workspace/complaint_portal`, is on `cursor/mnsuam-complaints-portal-08fe` and was diverged from origin (ahead 7, behind 13). Prefer `/workspace/complaints-vercel/src` on `vercel-test` as the current test-site source.
 
-**No.** The main website is a static upload to `mnsuam.edu.pk`. FIS is a PHP app on `fis.mnsuam.edu.pk`. This portal is a **Next.js application with a Turso database**. It cannot be dropped into a plain cPanel `public_html` as static files.
+## Architecture (website + FIS feed)
 
-**Pending owner decision:** keep the portal on Netlify or Vercel, or provision Node hosting on cPanel. New Netlify deploys are blocked until credits are added or the allowance resets, so a host decision also unblocks publishing `93ed797`.
+- The test website is a static export deployed on Vercel. `fis/build.sh` unpacks the site, injects `fis-widget.js` into every HTML page, applies typography/content fixes, and retargets Complaints Portal links.
+- Faculty lists and profiles on department pages are loaded from the FIS public feed, not from static HTML:
+  - Widget: `/workspace/vercel-test/fis/fis-widget.js`
+  - Single config value: `FIS_BASE` (currently `https://mnsuam-fis-test.vercel.app`). **At go-live, change `FIS_BASE` to `https://fis.mnsuam.edu.pk`**, then redeploy the website.
+  - Feed URL: `FIS_BASE + '/api-cache/'`
+- Department slug map: website paths do not always match FIS slugs. `fis-dept-map.js` is generated/wired from `department-map.csv` (see `wire-fis-widget.py`). A real bug: the site asked FIS for `plant-breeding-and-biotechnology`, but FIS stores IPBB as `institute-of-plant-breeding-and-biotechnology`. The same class of mismatch also affected IT, Statistics, and Plant Protection. The map was rebuilt from FIS's own names; all 21 department lists should work. Agricultural Extension has no staff in FIS, so it correctly has no list.
+- FIS `/api-cache` response headers: `Access-Control-Allow-Origin: *`, `Cache-Control` with `s-maxage=600` and `stale-while-revalidate=86400` (plus a short browser `max-age`). Cold starts copy `vercel/feed-seed`.
+- Complaints Portal URL is set once in `fis/build.sh` as `COMPLAINTS_PORTAL_URL` (currently `https://mnsuam-complaints-test.vercel.app`). Change it to the live portal address at go-live.
+- Test copies should keep the Demo badge and `noindex` / `robots.txt` `Disallow: /` until go-live. Canonical and `og:url` already point at `mnsuam.edu.pk`.
 
-On 13 November 2026 the owner asked to publish the website and FIS directly for cPanel and asked whether that would replace the live site and FIS. That question does **not** by itself authorise a Complaints Portal move. Do not change this portal's production host or merge PR #1 until the owner confirms.
+## What is done
 
-Never commit `.env.local`, Turso tokens, `SECRET_PEPPER`, SMTP/Resend keys, or bootstrap passwords.
+- Faculty lists load for all 21 departments with staff in FIS, including IPBB. AI & Data Science list and profiles were fixed after a feed-permission / retry issue (blinking or very slow load). Feed TTL 600s; typical list load is about a second when the cached feed is readable.
+- AI & DS department page: vision and mission updated from the owner's files; Programs Offered now includes **BS CS (Specialization in Data Science)** and **BS CS (Specialization in Artificial Intelligence)**, with program objectives copied exactly from those files (`aids-content.py`).
+- Menu, sidebar and quick links were fixed so pages do not go blank after a click. ORIC, BIAEC, Registrar, Counseling, International Students, Student Affairs, About Multan, and World Ranking were among the links confirmed working after that fix.
+- Duplicate office pages under Graduate Resource Center redirect to the full office pages (`office-canonical.py`).
+- FIS test copy has real public faculty data imported from the live FIS public API (read-only) plus old-site faculty pages: 163 people, plus Dr. Ayesha Hakim (curated, untouched). Sample/test accounts were renumbered and hidden from the public feed (`public_feed.exclude_email_domains = example.edu.pk`). Faculty of Computing placement follows Notification MNSUAM/FoC/2026/547 (`computing-faculty.csv`).
+- Complaints test copy matches the new website theme, is noindexed, and officers who can view a complaint can add an internal note.
+- A lean final pass script (`fis/final-pass.py` + `content-format.css`) was written to:
+  - show the latest annual report (2020-21) with an archive note
+  - remove "Award 2021" from menus
+  - update counseling page details
+  - rewrite leftover absolute `https://mnsuam.edu.pk/...` content links to same-site paths
+  - put merit-list links each on their own line
+  - make office staff photos a consistent size (those photos are copied from the old site, not from FIS)
+- A run of an earlier final-pass version wrote `/tmp/final-pass-report.json` at 14 Nov 2026, 11:54 PM PKT: annual report pages 5, Award 2021 removed 32, counseling files 4 (70 replacements), apex hrefs rewritten 2864, remaining apex hrefs none, case hrefs fixed 6599. Merit-list and staff-photo patches were added to the script and CSS after that report (files dated 15 Nov 2026, 12:04 AM PKT). **Confirm on the test site whether the latest script (including merit lists and staff photo sizes) was actually deployed.** Upload artifacts were being prepared under `/tmp/vercel-upload/` around that time.
 
----
+## What is still pending
 
-## Policy reminder
+Confirm or finish these before asking the owner for a go-live thumbs-up:
 
-Public procedure and privacy wording follows the university's adopted arrangements (Committee of Anti-Bullying and Harassment Monitoring; 45-day investigation target and seven-year record period for those files; ordinary-complaint SLAs as in `README.md`). Do not put notification numbers, circular dates, or committee constitution details back on the public pages (removed in `a356571`).
+1. Deploy and click-check the latest final pass on https://mnsuam-website-test.vercel.app: latest annual report + archive note, Award 2021 gone, counseling details, leftover old-domain links, merit list formatting (each link on its own line), even staff photo sizes on office pages such as `/office-c-e-o-administration-staff/`.
+2. Complaints Portal: officer contact emails are still placeholders (QA: "41 contact addresses are still placeholders, so live email will skip them").
+3. Add **Ms. Somiya** for harassment (portal / relevant page — do not invent details; use the owner's source).
+4. Two Faculty of Computing staff still have no FIS accounts (the owner will need to say who, or check `computing-faculty.csv` against the FIS import).
+5. Remaining QA from `/workspace/vercel-test/qa-report.md` that was not in the final pass, including: latest careers advert missing on `/careers/`; some duplicate/near-duplicate pages; repeated generic titles; Next.js header/footer prefetch wasting mobile data; no Content-Security-Policy on the main website; department Faculty Members headings (e.g. Entomology); typography leftovers; RAF-SP quick link currently `https://raf-sp-six.vercel.app/` (confirm with the owner); Faculty of Computing photo still needs the owner's pick; hostel page is still a single line (same as the old site — needs owner-supplied text if it should be expanded).
+6. Owner click-through of all three test sites, then an explicit thumbs-up to deploy.
 
-Keep this work separate from ADP work.
+## Go-live plan (do not start until thumbs-up)
+
+- Time: outside office hours (the owner preferred Sunday night or another night before Monday, depending on credits).
+- First, back up: current live website `public_html`, live FIS, and the `mnsuniet_fis` database.
+- Website: deploy to the current server `37.27.141.47` via cPanel (not by pointing the main domain at Vercel unless the owner later changes that plan).
+- FIS: stays on Namecheap at `https://fis.mnsuam.edu.pk` (deploy the new FIS there; do not take over the domain with the Vercel test URL).
+- Complaints Portal: deploy with the website (same hosting plan as the new site).
+- Then switch test-only settings to live:
+  - Remove the Demo badge from the website footer.
+  - Remove `robots.txt` `Disallow: /` and the `noindex, nofollow, noarchive, nocache` meta.
+  - Set `FIS_BASE` in `fis-widget.js` to `https://fis.mnsuam.edu.pk`.
+  - Set `COMPLAINTS_PORTAL_URL` to the live portal address.
+- Check that everything works, and keep the backup ready to roll back.
+- If usage credits are tight, do not start a live switch that cannot be finished. A half-finished cutover is worse than waiting for the Saturday reset or for the owner to add credits.
+
+## How to resume (next bot)
+
+1. Read this file and `/workspace/vercel-test/qa-report.md`. Pull or copy the `vercel-test` branches; never check out work onto `main` with the intent to merge.
+2. Confirm whether the 15 Nov 2026 final-pass changes are on the test website. If not, run the latest `final-pass.py` against the current build (`/tmp/vw-qa-build/public` or a fresh unpack of `site.tar.xz` plus `fis/build.sh`) and deploy only to the test Vercel projects.
+3. Give the owner a short click-through checklist (home, a few faculty pages including AI & DS and IPBB, office staff photos, merit lists, counseling, complaints portal, FIS login on the test copy only).
+4. Stop there until the owner explicitly says to deploy to the live domain/server.
+5. Only after thumbs-up: take backups, then follow the go-live plan above.
+
+## Push status (filled at handover time)
+
+See the end of `/workspace/HANDOVER-mnsuam.md` after the handover commit/push attempt, or the commit hashes in each local repo.
