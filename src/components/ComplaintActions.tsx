@@ -104,26 +104,6 @@ export function ComplaintActions({
         </button>
       </form>
 
-      <form
-        className="card fields"
-        onSubmit={(event) => {
-          event.preventDefault();
-          const form = new FormData(event.currentTarget);
-          void send({ type: "note", note: form.get("note") });
-          event.currentTarget.reset();
-        }}
-      >
-        <h2>Internal note</h2>
-        <p className="hint">Students never see internal notes.</p>
-        <div className="field">
-          <label htmlFor="note">Note</label>
-          <textarea id="note" name="note" required minLength={3} />
-        </div>
-        <button className="btn secondary" disabled={pending} type="submit">
-          Add note
-        </button>
-      </form>
-
       <div className="card">
         <h2>Escalation and key</h2>
         <p>Current level: {escalationLevel === 0 ? "Department" : escalationLevel === 1 ? "Dean" : "Vice Chancellor"}.</p>

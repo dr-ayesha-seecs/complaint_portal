@@ -71,7 +71,7 @@ export type ComplaintDetail = ComplaintRecord & {
   departmentName: string;
   overdue: boolean;
   events: ComplaintEvent[];
-  notes: { id: string; body: string; createdAt: string; authorName: string }[];
+  notes: { id: string; body: string; createdAt: string; authorName: string; authorRole: string }[];
   attachments: { id: string; filename: string; mime: string; size: number; createdAt: string }[];
   assignees: Assignee[];
 };
@@ -783,7 +783,7 @@ async function listEvents(complaintId: string): Promise<ComplaintEvent[]> {
 
 async function listNotes(complaintId: string) {
   const rows = await getClient().execute({
-    sql: `SELECT n.id, n.body, n.created_at, u.name AS author_name
+    sql: `SELECT n.id, n.body, n.created_at, u.name AS author_name, u.role AS author_role
           FROM internal_notes n JOIN users u ON u.id = n.author_id
           WHERE n.complaint_id = ? ORDER BY n.created_at ASC`,
     args: [complaintId],
@@ -795,6 +795,7 @@ async function listNotes(complaintId: string) {
       body: requiredText(record, "body"),
       createdAt: requiredText(record, "created_at"),
       authorName: requiredText(record, "author_name"),
+      authorRole: requiredText(record, "author_role"),
     };
   });
 }
@@ -847,9 +848,6 @@ export async function applyComplaintAction(
     return {};
   }
   const detail = await getComplaintForUser(user, id);
-  if (!canHandleComplaint(user)) {
-    throw new HttpError(403, "This account can view the complaint but cannot change it.");
-  }
   if (input.type === "note") {
     const note = input.note?.trim() ?? "";
     if (note.length < 3) throw new HttpError(400, "Write a short internal note.");
@@ -860,6 +858,9 @@ export async function applyComplaintAction(
     });
     await audit({ actorId: user.id, action: "note_added", entity: "complaint", entityId: id });
     return {};
+  }
+  if (!canHandleComplaint(user)) {
+    throw new HttpError(403, "This account can view the complaint but cannot change it.");
   }
   if (input.type === "rotate_secret") {
     if (detail.isAnonymous) throw new HttpError(400, "Keys for anonymous complaints cannot be reissued. The student must keep the original key.");

@@ -443,6 +443,20 @@ describe("complaint flow", () => {
     await expect(applyComplaintAction(vc, academicId, { type: "status", status: "acknowledged" }, "http://localhost:3000")).rejects.toMatchObject({
       status: 403,
     });
+    await applyComplaintAction(vc, academicId, { type: "note", note: "Test internal note" }, "http://localhost:3000");
+    const noted = await getComplaintForUser(vc, academicId);
+    expect(noted.notes).toHaveLength(1);
+    expect(noted.notes[0]).toMatchObject({
+      body: "Test internal note",
+      authorName: "Vice Chancellor",
+      authorRole: "vice_chancellor",
+    });
+    const tracked = await trackComplaint(created.trackingNumber, created.secretKey, "127.0.0.1");
+    expect(tracked).not.toHaveProperty("notes");
+    expect(JSON.stringify(tracked)).not.toContain("Test internal note");
+    await expect(applyComplaintAction(admin, academicId, { type: "note", note: "Admin should not see this file" }, "http://localhost:3000")).rejects.toMatchObject({
+      status: 404,
+    });
     await applyComplaintAction(vc, academicId, { type: "assign", assigneeId: csChair.id }, "http://localhost:3000");
     const assigned = await getComplaintForUser(csChair, academicId);
     expect(assigned.trackingNumber).toBe(created.trackingNumber);

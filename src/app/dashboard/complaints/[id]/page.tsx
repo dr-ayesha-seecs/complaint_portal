@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ComplaintActions } from "@/components/ComplaintActions";
+import { InternalNoteForm } from "@/components/InternalNoteForm";
 import { ComplaintAssign } from "@/components/ComplaintAssign";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getComplaintForUser, listAssignableUsers } from "@/lib/complaints";
 import { isCommitteeCategory } from "@/lib/policy";
 import { categoryLabel, semesterLabel } from "@/lib/categories";
 import { getCurrentUser } from "@/lib/current-user";
-import { canAssignComplaint, canHandleComplaint } from "@/lib/rbac";
+import { canAssignComplaint, canHandleComplaint, isRole, ROLE_LABELS } from "@/lib/rbac";
 import { audit } from "@/lib/audit";
 import { HttpError } from "@/lib/http";
 import { formatBytes, formatDateTime } from "@/lib/format";
@@ -119,12 +120,13 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
             {complaint.notes.map((note) => (
               <li key={note.id}>
                 <strong>
-                  {note.authorName} · {formatDateTime(note.createdAt)}
+                  {note.authorName} · {isRole(note.authorRole) ? ROLE_LABELS[note.authorRole] : note.authorRole} · {formatDateTime(note.createdAt)} PKT
                 </strong>
                 <p style={{ whiteSpace: "pre-wrap" }}>{note.body}</p>
               </li>
             ))}
           </ul>
+          <InternalNoteForm id={complaint.id} />
         </section>
         {canHandleComplaint(user) ? (
           <section className="section">
