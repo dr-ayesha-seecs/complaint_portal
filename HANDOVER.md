@@ -140,6 +140,64 @@ Confirm or finish these before asking the owner for a go-live thumbs-up:
 4. Stop there until the owner explicitly says to deploy to the live domain/server.
 5. Only after thumbs-up: take backups, then follow the go-live plan above.
 
-## Push status (filled at handover time)
+## Push status (15 Nov 2026, 12:08 AM PKT, Asia/Karachi)
 
-See the end of `/workspace/HANDOVER-mnsuam.md` after the handover commit/push attempt, or the commit hashes in each local repo.
+Local commits were made on each `vercel-test` branch. **None of the three branches could be pushed to GitHub.** `gh` is not logged in, and `git push` failed with: `could not read Username for 'https://github.com': terminal prompts disabled`. No new GitHub repositories were created. `main` was not updated, merged, or force-pushed.
+
+### Local commit hashes (push these; do not merge to main)
+
+| Project | Box repo | GitHub remote | Branch | Local HEAD | Pushed? |
+|---|---|---|---|---|---|
+| Website | `/workspace/vercel-test` | `https://github.com/dr-ayesha-seecs/mnsuam_website` (private; add as `origin`; keep existing `main` and `cursor/mnsuam-preview-upload-b950` untouched) | `vercel-test` (new orphan branch) | `f871e6d71e502b4a0e1685d6497d0fdc150cd6f6` | No |
+| FIS | `/workspace/fis-vercel/src` | `https://github.com/dr-ayesha-seecs/FIS` (private; `origin` added) | `vercel-test` | `15e0e8953b2ac7f0092b87f82a4b274b0589556c` | No |
+| Complaints Portal | `/workspace/complaints-vercel/src` | `https://github.com/dr-ayesha-seecs/complaint_portal` | `vercel-test` | `aeee8cc410bbba4dc227c31c8581510a532e4021` | No |
+
+### Git bundles (use these if the box git remotes are missing later)
+
+- `/workspace/handover/bundles/mnsuam-website-vercel-test.bundle`
+- `/workspace/handover/bundles/FIS-vercel-test.bundle`
+- `/workspace/handover/bundles/complaint_portal-vercel-test.bundle`
+
+To clone a bundle: `git clone <bundle> -b vercel-test <dir>`.
+
+### How to push once GitHub auth is available
+
+Do not use `--force` and do not push `main`. After `gh auth login` (or equivalent git credentials for `dr-ayesha-seecs`):
+
+```bash
+git -C /workspace/vercel-test push -u origin vercel-test
+git -C /workspace/fis-vercel/src push -u origin vercel-test
+git -C /workspace/complaints-vercel/src push -u origin vercel-test
+```
+
+### Intentionally not committed
+
+- All `secrets/` dirs, `*.env`, `token.txt`, login/password files listed above.
+- Website upload chunks and large media: `main/part-*`, `main/site.tar.xz`, `fis/restore-overlay-part-*`, `assets/`, QA screenshots, computing/social-sciences option photos.
+- Full HTML trees: `/workspace/webnew/site`, `/tmp/vw-qa-build/public` (stay on the box only).
+- FIS tools/secrets outside `/workspace/fis-vercel/src` except `DEPLOY-STEPS.md` and `department-map.csv`, which were copied into the repo.
+
+Handover file paths:
+- `/workspace/HANDOVER-mnsuam.md` (shared box copy; this push-status section lives here)
+- `/workspace/handover/HANDOVER.md`
+- `/workspace/vercel-test/HANDOVER.md` (committed in `f871e6d`)
+- `/workspace/fis-vercel/src/HANDOVER.md` (committed in `15e0e89`)
+- `/workspace/complaints-vercel/src/HANDOVER.md` (committed in `aeee8cc`)
+
+
+---
+## UPDATE 2026-11-15 06:00 PKT — open issues reported by user (in progress, NOT yet verified fixed)
+Credits nearly exhausted; next bot should continue from here. A fix pass was running on branch `vercel-test` in /workspace/vercel-test (check `git log` / `git status` for uncommitted work; check latest Vercel deployment of mnsuam-website-test).
+Reported issues to fix and verify on https://mnsuam-website-test.vercel.app :
+1. **Intermittent links (TOP PRIORITY):** links sometimes work, sometimes not. Find root cause (client-side nav/prefetch, trailing-slash redirects, hydration, CDN-cached 404s, stale alias). Repro with repeated curl + headers.
+2. Search intermittent (failed earlier, worked later) — make deterministic (wait for index, retry).
+3. /offices/office-of-biaec/-office-staff-members/ broken (bad leading-hyphen slug); scan for other `/-` slugs.
+4. Director External Linkages page/link broken.
+5. ORIC does not open; ORIC staff cards misaligned (use uniform grid, 180x180).
+6. University Web Radio page mostly empty — copy full content from old site (read-only GET).
+7. World Ranking link does not open.
+8. /crop-advisory/ broken.
+9. Text "More information is available from the related pages in this section." still appears on AI&DS faculty page after refresh — remove site-wide, spinner only; widget must load on hard refresh.
+10. Abdul Razzaq profile photo missing (AI&DS faculty) — fix photo + add placeholder avatar fallback.
+11. Then run a FULL crawl: every internal link 200, flag near-empty pages vs old site; fix or list.
+Still pending from before: push 3 vercel-test branches to GitHub (gh not authenticated — user must connect GitHub); user thumbs-up before any live switch; all hard rules above still apply.
