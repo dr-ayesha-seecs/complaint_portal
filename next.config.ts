@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Set NEXT_OUTPUT=standalone for self-hosted Node (cPanel/Passenger) builds.
+  ...(process.env.NEXT_OUTPUT === "standalone" ? { output: "standalone" as const } : {}),
   serverExternalPackages: ["@libsql/client", "bcryptjs", "nodemailer"],
   experimental: {
     serverActions: {
