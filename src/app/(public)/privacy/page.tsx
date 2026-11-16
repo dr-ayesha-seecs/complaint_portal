@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COMMITTEE_NAME, REGISTRAR_ADDRESS, REGISTRAR_EMAIL, REGISTRAR_PHONE } from "@/lib/policy";
+import { REGISTRAR_ADDRESS, REGISTRAR_EMAIL, REGISTRAR_PHONE } from "@/lib/policy";
 
 export const metadata: Metadata = { title: "Privacy notice" };
 
@@ -15,7 +15,7 @@ export default function PrivacyPage() {
 
         <h2>Who is responsible</h2>
         <p>
-          Muhammad Nawaz Shareef University of Agriculture, Multan, {REGISTRAR_ADDRESS}. Questions about this notice can go to the Registrar Office through the university exchange, {REGISTRAR_PHONE}, or {REGISTRAR_EMAIL}. The portal owner inside the university is the Chairperson, Department of Artificial Intelligence and Data Science, Prof. Dr. Ayesha Hakim, who is also the Convener of the {COMMITTEE_NAME}.
+          Muhammad Nawaz Shareef University of Agriculture, Multan, {REGISTRAR_ADDRESS}. Questions about this notice can go to the Registrar Office through the university exchange, {REGISTRAR_PHONE}, or {REGISTRAR_EMAIL}. The portal owner inside the university is the Chairperson, Department of Artificial Intelligence and Data Science, Prof. Dr. Ayesha Hakim.
         </p>
 
         <h2>What we collect</h2>
@@ -30,7 +30,7 @@ export default function PrivacyPage() {
 
         <h2>Why we use it</h2>
         <p>
-          To acknowledge, investigate, respond to, escalate, and review complaints, and to let the university carry out the Anti-Bullying and Harassment Policy through the {COMMITTEE_NAME}. Staff audit logs exist so the university can see who opened or changed a confidential file.
+          To acknowledge, investigate, respond to, escalate, and review complaints, and to let the university carry out the Anti-Bullying and Harassment Policy. Staff audit logs exist so the university can see who opened or changed a confidential file.
         </p>
 
         <h2>Who sees it</h2>
@@ -38,8 +38,8 @@ export default function PrivacyPage() {
           <li>The Vice Chancellor can see every complaint.</li>
           <li>A dean sees complaints for their faculty. A chairperson sees complaints for their department.</li>
           <li>Complaints staff see the faculty or department they are assigned to. Unassigned central staff do not see bullying, discrimination or harassment files.</li>
-          <li>The {COMMITTEE_NAME} sees bullying, discrimination and harassment files.</li>
-          <li>Email notices go to the chairperson and the dean. Notices of bullying, discrimination or harassment also go to the committee when those addresses are configured. If you say the head of department is involved, the chairperson is not emailed.</li>
+          <li>Officers designated to handle bullying, discrimination and harassment files see those files.</li>
+          <li>Email notices go to the chairperson and the dean. Notices of bullying, discrimination or harassment also go to the other officers responsible for those files when those addresses are configured. If you say the head of department is involved, the chairperson is not emailed.</li>
           <li>Placeholder addresses (for example those ending in .invalid) are not delivered once live email is switched on.</li>
           <li>We do not sell personal information and we do not use advertising or third-party font and analytics services.</li>
         </ul>
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
           <li>Anonymous complaints are not accepted. Your name, programme, semester, email, and mobile number are required for verification and will remain strictly confidential. You will need the tracking key to see the status. If you lose the key, a member of staff can issue a new one after confirming your identity.</li>
           <li>You may withdraw an ordinary complaint. A bullying, discrimination or harassment complaint may still be examined after a withdrawal request.</li>
           <li>You may ask the Registrar to correct a factual mistake in your contact details.</li>
-          <li>Read the <Link href="/procedure">procedure</Link> for response times, the official committee, and the rule against retaliation.</li>
+          <li>Read the <Link href="/procedure">procedure</Link> for response times and the rule against retaliation.</li>
         </ul>
 
         <h2>Security</h2>

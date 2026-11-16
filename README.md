@@ -23,12 +23,12 @@ The in-portal procedure (`/procedure`) and privacy notice (`/privacy`) follow th
 
 | Source | What this portal takes from it |
 | --- | --- |
-| **Committee of Anti-Bullying and Harassment Monitoring** of Muhammad Nawaz Shareef University of Agriculture, Multan (Convener: Dr. Ayesha Hakim; members include the Director Student Affairs (Female) in the case of a student, the Deputy Registrar (HR), and a member/secretary) | The committee implements the Anti-Bullying and Harassment Policy on campus, arranges guidance sessions, explains the reporting process, and submits a report to the proper forum for further inquiry and action. Bullying, discrimination and harassment files are routed to this committee. |
-| Anti-Discrimination-Anti-Harassment complaint procedure adopted for use with that committee | No anonymous filing on this portal (name, programme, semester, email and mobile number are required and kept strictly confidential). Prompt, thorough and impartial investigation, completed within **45 days** where possible, with notice to the complainant if more time is needed. Both parties are heard. An investigatory file is kept. Findings go to both parties and the relevant dean or director. The head of department confirms remedial action within **14 days**. Records of these complaints are kept for **seven years** after the investigation concludes. Confidentiality to the greatest extent possible. A clear prohibition on retaliation, including against witnesses and people associated with the complainant. |
+| University Anti-Bullying and Harassment Policy | Bullying, discrimination and harassment files are handled under this policy. A report is submitted to the proper forum for further inquiry and action. |
+| Anti-Discrimination-Anti-Harassment complaint procedure adopted by the university | No anonymous filing on this portal (name, programme, semester, email and mobile number are required and kept strictly confidential). Prompt, thorough and impartial investigation, completed within **45 days** where possible, with notice to the complainant if more time is needed. Both parties are heard. An investigatory file is kept. Findings go to both parties and the relevant dean or director. The head of department confirms remedial action within **14 days**. Records of these complaints are kept for **seven years** after the investigation concludes. Confidentiality to the greatest extent possible. A clear prohibition on retaliation, including against witnesses and people associated with the complainant. |
 
 **Ordinary complaints.** Automatic acknowledgement at once. A person should acknowledge the file within **2 working days** (Monday–Friday, Asia/Karachi). Written outcome within **20 working days**, extendable with reasons up to 40 working days. A student may ask for the outcome to be reviewed within **10 working days**; that review is due within **15 working days**.
 
-**Bullying, discrimination and harassment.** Automatic acknowledgement at once, and notification of the official committee. A person should acknowledge the file within **2 working days**. Investigation target **45 calendar days**, extendable with notice to the student. Confirmation of remedial action within **14 days**. The committee reports to the proper forum. A student may ask the Registrar or the Vice Chancellor to review how the file was handled. A withdrawal is recorded as a request, because the university may still have to inquire.
+**Bullying, discrimination and harassment.** Automatic acknowledgement at once, and notification of the officers who have to act on it. A person should acknowledge the file within **2 working days**. Investigation target **45 calendar days**, extendable with notice to the student. Confirmation of remedial action within **14 days**. A report is submitted to the proper forum. A student may ask the Registrar or the Vice Chancellor to review how the file was handled. A withdrawal is recorded as a request, because the university may still have to inquire.
 
 Overdue files are flagged on the staff dashboard. There is no background cron: the overdue state is calculated whenever someone opens the desk.
 
@@ -62,7 +62,7 @@ To set real addresses:
 
 While email delivery is in log-only mode, placeholder addresses are still recorded so you can see who would have been notified. Once SMTP or Resend is configured, placeholder addresses are **not sent**. They are stored in `mail_log` as `skipped_placeholder`. The overview page counts how many placeholders remain.
 
-Bullying, discrimination and harassment complaints are emailed to the Committee of Anti-Bullying and Harassment Monitoring only when those settings have an address. They ship as placeholders until you replace them.
+Bullying, discrimination and harassment complaints are emailed to the designated contacts for those files only when those settings have an address. They ship as placeholders until you replace them.
 
 ## Environment variables
 
@@ -160,7 +160,7 @@ Suggested menu label: **Student complaints**.
 - A student name is mandatory on every complaint, even if someone calls the API directly. Anonymous submissions are rejected.
 - Historical anonymous files, if any, still cannot have their tracking keys recovered. A named student can be given a new key after a member of staff confirms their identity. That action is audited.
 - Investigatory files for bullying, discrimination and harassment are retained for seven years after the investigation concludes, as set out in the adopted complaint procedure. Ordinary files are kept as university records and later reviewed for deletion. The software does not delete files on a timer.
-- The public procedure and privacy notice describe the official committee and the adopted complaint procedure. They are not a substitute for any later university statute.
+- The public procedure and privacy notice describe the adopted complaint procedure. They are not a substitute for any later university statute.
 - CSV export and attachment download are limited to staff who may already open that complaint. Students keep their own copies of attachments. The tracking page does not offer a second download link, so the secret key is never used as a file URL.
 - No third-party analytics or font CDN is loaded. The portal is English only.
 - `npm run build` does not need a database. Pages that read complaints are rendered on request.

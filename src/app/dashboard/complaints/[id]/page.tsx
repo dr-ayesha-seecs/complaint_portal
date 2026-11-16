@@ -38,7 +38,7 @@ export default async function ComplaintDetailPage({ params }: { params: Promise<
         </p>
         {isCommitteeCategory(complaint.category) ? (
           <p className="banner danger">
-            Confidential file for the Committee of Anti-Bullying and Harassment Monitoring. Do not forward it. Retaliation against the student or a witness is prohibited. Handle it under the university&apos;s Anti-Bullying and Harassment Policy. The investigation should be completed within 45 days where possible.
+            Confidential file under the university&apos;s Anti-Bullying and Harassment Policy. Do not forward it. Retaliation against the student or a witness is prohibited. Handle it under the university&apos;s Anti-Bullying and Harassment Policy. The investigation should be completed within 45 days where possible.
           </p>
         ) : null}
         {complaint.concernsDepartmentHead ? (

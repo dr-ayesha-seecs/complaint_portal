@@ -11,7 +11,7 @@ import { isCommitteeCategory } from "./policy";
  *
  * Bullying, discrimination and harassment files follow the investigation
  * timetable in the Anti-Discrimination-Anti-Harassment complaint procedure
- * used by the Committee of Anti-Bullying and Harassment Monitoring: a
+ * used for bullying, discrimination and harassment files: a
  * prompt, thorough and impartial investigation, to be completed within
  * 45 days where possible, with notice to the complainant if that period
  * has to be extended; the relevant head of department confirms remedial

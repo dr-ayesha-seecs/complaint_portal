@@ -252,7 +252,8 @@ describe("routing and access", () => {
     expect(message.text).not.toContain(narrative);
     expect(message.text).not.toContain("Test Student");
     expect(message.subject).toContain("Confidential");
-    expect(message.text).toContain("Committee of Anti-Bullying and Harassment Monitoring");
+    expect(message.text).toContain("Anti-Bullying and Harassment Policy");
+    expect(message.text).not.toContain("Committee of Anti-Bullying and Harassment Monitoring");
     expect(message.text).not.toContain("HEC Policy");
     expect(message.text).not.toContain("2010");
   });

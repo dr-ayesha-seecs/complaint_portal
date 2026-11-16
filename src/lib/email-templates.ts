@@ -1,5 +1,5 @@
 import { categoryLabel } from "./categories";
-import { isCommitteeCategory, COMMITTEE_NAME } from "./policy";
+import { isCommitteeCategory } from "./policy";
 import { formatDateTime } from "./format";
 import type { RecipientRole } from "./routing";
 import { UNIVERSITY_NAME, UNIVERSITY_SHORT } from "./university";
@@ -7,8 +7,8 @@ import { UNIVERSITY_NAME, UNIVERSITY_SHORT } from "./university";
 const ROLE_LINE: Record<RecipientRole, string> = {
   chairperson: "You are receiving this because you are recorded as the chairperson of the department.",
   dean: "You are receiving this because you are recorded as the dean of the faculty.",
-  harassment_focal: "You are receiving this as a contact for the Committee of Anti-Bullying and Harassment Monitoring.",
-  harassment_committee: "You are receiving this as a contact for the Committee of Anti-Bullying and Harassment Monitoring.",
+  harassment_focal: "You are receiving this as a designated contact for a bullying, discrimination or harassment complaint.",
+  harassment_committee: "You are receiving this as a designated contact for a bullying, discrimination or harassment complaint.",
   vice_chancellor: "You are receiving this because the complaint has been escalated to the Vice Chancellor.",
 };
 
@@ -51,7 +51,7 @@ export function staffEmail(input: {
         input.escalationNote ?? "",
         "",
         "The complainant's identity and the narrative are visible only after you sign in to the portal.",
-        `Handle this under the university's Anti-Bullying and Harassment Policy, through the ${COMMITTEE_NAME}. Aim to complete the investigation within 45 days where possible. Confirm remedial action to the dean or director within 14 days.`,
+        "Handle this under the university's Anti-Bullying and Harassment Policy. Aim to complete the investigation within 45 days where possible. Confirm remedial action to the dean or director within 14 days.",
         "Retaliation against the complainant or a witness is prohibited.",
         "",
         `Sign in: ${input.appUrl}/login`,
@@ -122,7 +122,7 @@ export function studentEmail(input: {
       `Target response date: ${formatDateTime(input.dueAt)} (Pakistan time)`,
       "",
       input.harassment
-        ? "This file is confidential. It will be referred to the Committee of Anti-Bullying and Harassment Monitoring. The university prohibits retaliation against you, against a witness, or against anyone associated with you. The investigation should be completed within 45 days where possible. If more time is needed, you will be told. You may ask the Registrar or the Vice Chancellor to review how the file was handled."
+        ? "This file is confidential and will be handled under the university's Anti-Bullying and Harassment Policy. The university prohibits retaliation against you, against a witness, or against anyone associated with you. The investigation should be completed within 45 days where possible. If more time is needed, you will be told. You may ask the Registrar or the Vice Chancellor to review how the file was handled."
         : "The department and the dean have been notified. A member of staff should acknowledge the file within 2 working days, and the target for a written outcome is 20 working days. You may ask for the outcome to be reviewed within 10 working days.",
       "",
       "Making a complaint in good faith must not affect your studies, residence, grades, or employment at the university.",

@@ -32,7 +32,7 @@ export default function HomePage() {
           <ul>
             <li>An acknowledgement and a unique tracking number as soon as you submit.</li>
             <li>A response target of {SLA.standard.resolutionWorkingDays} working days for most complaints.</li>
-            <li>Bullying, discrimination and harassment files go to the official Committee of Anti-Bullying and Harassment Monitoring, with an investigation target of {SLA.harassment.inquiryCalendarDays} days.</li>
+            <li>Bullying, discrimination and harassment files are handled confidentially under the university&apos;s Anti-Bullying and Harassment Policy, with an investigation target of {SLA.harassment.inquiryCalendarDays} days.</li>
             <li>A way to ask for a review, and a clear rule against retaliation.</li>
           </ul>
           <p className="hint">Your name, programme, semester, email, and mobile number are required on every complaint for verification and will remain strictly confidential. Only the officers who need to act on the file can see them.</p>
@@ -58,7 +58,7 @@ export default function HomePage() {
       <section className="section grid-3">
         <article className="card">
           <h3>Confidential</h3>
-          <p>The file is shared with the people who have to act on it: the chairperson, the dean, and, for bullying, discrimination or harassment, the Committee of Anti-Bullying and Harassment Monitoring. It is not published.</p>
+          <p>The file is shared with the people who have to act on it: the chairperson, the dean, and the other officers responsible for the category you choose. It is not published.</p>
         </article>
         <article className="card">
           <h3>No retaliation</h3>
