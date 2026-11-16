@@ -330,8 +330,35 @@ p { margin: 0 0 0.8rem; }
 .section h2 { margin-bottom: 0.8rem; }
 .section .card { text-decoration: none; color: inherit; transition: transform 0.25s var(--mns-ease), box-shadow 0.25s var(--mns-ease), border-color 0.25s; }
 .section .card:hover { transform: translateY(-3px); box-shadow: var(--mns-shadow); border-color: transparent; color: inherit; }
-.choice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.55rem; }
-.choice-group { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.55rem; }
+.category-section {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+.category-section > h2 { margin-bottom: 0; }
+.category-group { margin-top: 2rem; }
+.category-group h3 { margin: 0 0 0.85rem; }
+.choice-grid,
+.choice-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  gap: 0.85rem;
+  width: 100%;
+  min-width: 0;
+  align-items: stretch;
+}
+.choice-group { grid-column: 1 / -1; }
+.category-group .card {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 1.15rem 1.2rem;
+  min-width: 0;
+}
+.category-group .card strong {
+  display: block;
+  line-height: 1.35;
+}
 .choice {
   display: grid;
   grid-template-columns: auto 1fr;

@@ -39,10 +39,10 @@ export default function HomePage() {
         </aside>
       </section>
 
-      <section className="section">
+      <section className="section category-section">
         <h2>What you can complain about</h2>
         {groups.map((group) => (
-          <div key={group}>
+          <div key={group} className="category-group">
             <h3>{group}</h3>
             <div className="choice-grid">
               {CATEGORIES.filter((item) => item.group === group).map((item) => (
